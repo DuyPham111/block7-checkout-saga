@@ -11,7 +11,7 @@ App bán hàng **Saga Shop** gồm ba service HTTP: **Order**, **Inventory** và
 | [REPORT.html](REPORT.html) | Báo cáo dạng slide (37 trang = 18 trang thuyết trình + 19 trang giải thích lựa chọn), chế độ **Đọc tài liệu**, mở offline |
 | [AUDIT.md](AUDIT.md) | Đối chiếu từng yêu cầu của đề ↔ nơi hiện thực ↔ test/evidence |
 | [SUBMISSION.md](SUBMISSION.md) | Thông tin gói nộp |
-| [docs/](docs/) | Nguyên lý hoạt động, hướng dẫn demo, kịch bản thuyết trình, đặc tả OpenAPI |
+| [docs/](docs/) | Nguyên lý hoạt động, hướng dẫn demo, kịch bản thuyết trình, [kịch bản video demo](docs/KICH-BAN-VIDEO.md), đặc tả OpenAPI |
 | [evidence/](evidence/) | Kết quả test, tổng hợp H0–F6, timeline + snapshot ba kho, baseline |
 
 ---
@@ -192,7 +192,7 @@ ui/                       Web UI (HTML/CSS/JS thuần)
 scripts/                  lab.js, ui-server.js, scenarios.js, demo.js, baseline.js, test-report.js, build-report.js
 test/                     unit/ (machine, openapi), integration/ (idempotency, saga.v1, recovery), global-setup
 data/seed/                dữ liệu ban đầu (JSON)            data/*.db  DB lúc chạy (không nộp)
-docs/                     NGUYEN-LY.md, HUONG-DAN-DEMO.md, THUYET-TRINH.md, openapi.yaml
+docs/                     NGUYEN-LY.md, HUONG-DAN-DEMO.md, THUYET-TRINH.md, KICH-BAN-VIDEO.md, openapi.yaml
 presentation/             slides.html + img/ (ảnh chụp UI)
 report/                   extra-slides.html, notes.json (nguồn của REPORT.html)
 evidence/                 test-output.txt, SUMMARY.md, H0..F6/timeline.txt + result.json, baseline.txt

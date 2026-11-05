@@ -194,7 +194,9 @@ Hoặc dùng `npm run reset` để chạy lại từ đầu.
 
 ## 5. Quay video nộp bài (H0, F1–F6 trên UI)
 
-- Dùng **Xbox Game Bar** (`Win + Alt + R`) hoặc OBS. Khung hình gồm **app + terminal** để thấy lệnh kill/start và UI đổi trạng thái cùng lúc.
+> Kịch bản quay chi tiết từng cảnh (lời thoại, thao tác, điểm chụp ảnh, bảng kiểm): **[KICH-BAN-VIDEO.md](KICH-BAN-VIDEO.md)**.
+
+- Dùng **OBS Studio** (Display Capture) hoặc **Snipping Tool** (`Win + Shift + R`, chọn vùng). **Không dùng Xbox Game Bar**: nó chỉ quay một cửa sổ, nên không thấy được terminal kill/start cùng lúc với UI đổi trạng thái.
 - Thứ tự: D1 → D7 như mục 2. Mỗi kịch bản dừng 1–2 giây ở **trạng thái giữa chừng** (RECOVERING, COMPENSATING) và ở **trạng thái cuối**.
 - Chụp ảnh UI lúc pending và lúc kết thúc. Ảnh mẫu đã có trong `presentation/img/` (`10-f4-payment-down.jpg`, `11-f4-recovering.jpg`, `12-f4-recovered.jpg`, …).
 - Đính kèm: `evidence/SUMMARY.md`, `evidence/<ID>/timeline.txt`, `evidence/test-output.txt`, `evidence/baseline.txt`.

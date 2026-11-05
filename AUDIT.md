@@ -88,7 +88,7 @@ Không đổi tên route nào nên không cần bảng ánh xạ. Đặc tả đ
 | ✅ State và restart | Toàn bộ repo, scripts start/stop/reset/resume, hướng dẫn chạy lại | README.md; `scripts/lab.js` |
 | ✅ Compensation và terminal | Kết quả H0, F1–F3 với snapshot ba kho | `evidence/H0..F3/timeline.txt` |
 | ✅ Unknown outcome | Cấu hình timeout, resume, retry; thời gian phục hồi quan sát được | `config.js`, README §3; `evidence/SUMMARY.md` |
-| 🟡 Web UI | **Video** demo H0, F1–F6 trên UI; ảnh UI lúc pending và lúc kết thúc | Ảnh: `presentation/img/`. Video: nhóm quay theo `docs/HUONG-DAN-DEMO.md` §5 |
+| 🟡 Web UI | **Video** demo H0, F1–F6 trên UI; ảnh UI lúc pending và lúc kết thúc | Ảnh: `presentation/img/`. Video: nhóm quay theo [docs/KICH-BAN-VIDEO.md](docs/KICH-BAN-VIDEO.md) (có bảng kiểm rubric) |
 | ✅ Evidence | Trace F4–F6: marker, op ID trước/sau restart, lệnh phục hồi; nhóm giải thích diff agent tạo | `evidence/F4..F6/timeline.txt`; REPORT.md |
 | ✅ Trình bày năm phần | Vấn đề, thiết kế, demo, bằng chứng, đánh đổi | `presentation/slides.html`, `docs/THUYET-TRINH.md` |
 

@@ -6,7 +6,7 @@
 - **Nội dung:** mã nguồn, dữ liệu ban đầu (`data/seed/`), README.md, REPORT.md, REPORT.html, AUDIT.md, tài liệu (`docs/`), slide (`presentation/`), evidence (`evidence/`).
 - **Không kèm:** `node_modules`, file DB lúc chạy (`data/*.db`), `run/`, `logs/`, `.git`. Cài lại thư viện bằng `npm ci`; DB tự tạo từ seed khi chạy `npm run reset`.
 - **Evidence** trong `evidence/` là output của lượt chạy thật ngày 05/11/2026 (Windows 11, Node 22.16.0). Không sửa tay số liệu. Tái tạo bằng `npm run test:report`, `npm run evidence`, `npm run baseline`.
-- **Video demo H0, F1–F6 trên UI:** nhóm quay theo `docs/HUONG-DAN-DEMO.md` mục 5 và nộp kèm. Nộp dưới dạng link thì ghi link vào đây.
+- **Video demo H0, F1–F6 trên UI:** quay theo [docs/KICH-BAN-VIDEO.md](docs/KICH-BAN-VIDEO.md) (10 cảnh, khoảng 11 phút) và nộp kèm. Nộp dưới dạng link thì ghi link vào đây: _(chưa có)_. Ảnh UI lúc pending và lúc kết thúc lưu ở `evidence/video-screens/`.
 - **Tạo gói** từ repository (chỉ gồm file được git theo dõi):
 
   ```bash
