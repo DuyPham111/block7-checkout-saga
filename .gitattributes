@@ -1,0 +1,2 @@
+# Giữ nguyên xuống dòng LF cho file checksum để sha256sum -c chạy được trên mọi hệ điều hành
+CHECKSUMS.sha256 -text
