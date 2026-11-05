@@ -71,7 +71,7 @@ svg text{font-family:"Segoe UI",system-ui,sans-serif}
   <h1>Checkout Saga<br>Giao dịch phân tán qua 3 service</h1>
   <p class="sub">Order · Inventory · Payment (ví tiền) — 3 process, 3 database riêng, orchestrator có Saga record bền vững, bù khi lỗi, tự phục hồi khi process bị kill.</p>
   <div class="chips"><span class="chip">23127045</span><span class="chip">23127102</span><span class="chip">23127159</span><span class="chip">23127183</span><span class="chip">23127393</span></div>
-  <div class="chips"><span class="chip">28/28 test xanh</span><span class="chip">7/7 kịch bản H0, F1–F6 đạt oracle</span><span class="chip">Kill process thật</span></div>
+  <div class="chips"><span class="chip">30/30 test xanh</span><span class="chip">7/7 kịch bản H0, F1–F6 đạt oracle</span><span class="chip">Kill process thật</span></div>
 </section>
 
 <!-- 2 -->
@@ -83,7 +83,7 @@ svg text{font-family:"Segoe UI",system-ui,sans-serif}
     <div class="card"><div class="n">1</div><h3>Vấn đề</h3><p>Checkout đi qua 3 DB. ROLLBACK một DB không gỡ được tiền đã thu ở DB khác.</p></div>
     <div class="card"><div class="n">2</div><h3>Thiết kế</h3><p>Vì sao Saga thay vì 2PC. Kiến trúc, state machine, intent → call → outcome, operation ID.</p></div>
     <div class="card"><div class="n">3</div><h3>Demo</h3><p>App thật với 3 góc nhìn: khách, kho, ví. H0, F1–F6, trong đó có kill Payment và kill orchestrator.</p></div>
-    <div class="card"><div class="n">4</div><h3>Bằng chứng</h3><p>28 test, oracle 7/7, snapshot 3 kho, marker, PID trước/sau restart.</p></div>
+    <div class="card"><div class="n">4</div><h3>Bằng chứng</h3><p>30 test, oracle 7/7, snapshot 3 kho, marker, PID trước/sau restart.</p></div>
     <div class="card"><div class="n">5</div><h3>Đánh đổi</h3><p>Mất isolation, bù có độ trễ, một orchestrator, chưa có outbox.</p></div>
   </div>
 </section>
@@ -95,7 +95,7 @@ svg text{font-family:"Segoe UI",system-ui,sans-serif}
   <p class="sub">Baseline cố ý sai: <span class="mono">reserve(); charge(); confirm();</span> — không prepare, không vote, không bù. Chạy bằng <span class="mono">npm run baseline</span></p>
   <div class="cols c46">
     <pre class="term"><span class="c">$ npm run baseline</span>
-Baseline checkout cho đơn BASE-82626 — CUS-CUONG, số dư 1.000.000đ
+Baseline checkout cho đơn BASE-7187 — CUS-CUONG, số dư 1.000.000đ
 1. reserve → 201: R7 ACTIVE   <span class="y">(Inventory DB ĐÃ COMMIT)</span>
 2. charge  → 201: C7 CHARGED  <span class="y">(Payment DB ĐÃ COMMIT)</span>
 3. confirm → <span class="r">LỖI</span>: Order "rollback" đơn của mình… và dừng.
@@ -437,17 +437,18 @@ ORACLE F6: <span class="g">ĐẠT 9/9</span></pre>
 <!-- 16 -->
 <section class="slide" data-title="Bằng chứng">
   <div class="kick">4 · Bằng chứng</div>
-  <h2>Kết quả: 28/28 test, 7/7 kịch bản đạt oracle</h2>
+  <h2>Kết quả: 30/30 test, 7/7 kịch bản đạt oracle</h2>
   <p class="sub">Test chạy trên 3 process thật (cổng 400x). Evidence: <span class="mono">evidence/test-output.txt</span>, <span class="mono">evidence/SUMMARY.md</span>, <span class="mono">evidence/&lt;ID&gt;/timeline.txt</span></p>
   <div class="cols c46">
     <div style="display:flex;flex-direction:column;gap:10px">
       <div class="cols c2" style="flex:none">
-        <div class="card ok"><div class="big">28/28</div><p>test xanh · 4 suite · khoảng 15 giây</p></div>
+        <div class="card ok"><div class="big">30/30</div><p>test xanh · 5 suite · khoảng 15 giây</p></div>
         <div class="card ok"><div class="big">48/48</div><p>check oracle trên 7 kịch bản</p></div>
       </div>
       <table>
         <tr><th>Suite</th><th>Số test</th><th>Nội dung</th></tr>
         <tr><td>unit/machine</td><td>16</td><td>chuyển trạng thái, guard, unknown outcome</td></tr>
+        <tr><td>unit/openapi</td><td>2</td><td>route trong code = route trong tài liệu Swagger</td></tr>
         <tr><td>idempotency</td><td>5</td><td>gửi lại cùng op, khác payload → 409, refund 1 lần</td></tr>
         <tr><td>saga.v1</td><td>4</td><td><b>H0, F1, F2, F3</b>: assert cả 3 kho + toàn ledger</td></tr>
         <tr><td>recovery</td><td>3</td><td><b>F4, F5, F6</b> tự động, kill process thật</td></tr>

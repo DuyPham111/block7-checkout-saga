@@ -2,7 +2,8 @@
 // PAYMENT SERVICE (ví tiền khách hàng) — process riêng, DB riêng (data/payment.db).
 // Sở hữu: số dư ví và LEDGER (sổ cái). Ledger chỉ INSERT: charge, refund, nạp tiền — không sửa, không xóa.
 const path = require('node:path');
-const { PORTS, HOST, DATA_DIR, FREEZE_MS } = require('../../config');
+const fs = require('node:fs');
+const { PORTS, HOST, DATA_DIR, SEED_DIR, FREEZE_MS } = require('../../config');
 const { openDb, tx, now } = require('../../common/db');
 const { makeLogger, freeze } = require('../../common/log');
 const { createFaults } = require('../../common/faults');
@@ -33,11 +34,8 @@ CREATE TABLE IF NOT EXISTS ledger (
 CREATE UNIQUE INDEX IF NOT EXISTS one_refund_per_charge ON ledger(ref_charge_id) WHERE kind = 'refund';
 ${OPS_SCHEMA}`;
 
-const SEED_WALLETS = [
-  ['CUS-AN', 'Nguyễn Văn An', 2000000],
-  ['CUS-BINH', 'Trần Thị Bình', 300000], // ít tiền => F2 tự nhiên (không đủ số dư)
-  ['CUS-CUONG', 'Lê Minh Cường', 1000000],
-];
+// Dữ liệu ban đầu đọc từ data/seed/payment.json (Bình chỉ có 300.000đ => F2 tự nhiên)
+const SEED_WALLETS = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'payment.json'), 'utf8')).wallets.map((w) => [w.customer_id, w.name, w.balance]);
 
 const log = makeLogger('payment');
 const faults = createFaults();

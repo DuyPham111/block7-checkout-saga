@@ -1,0 +1,9 @@
+{
+  "_mo_ta": "Dữ liệu ban đầu của Inventory service (nạp khi data/inventory.db trống hoặc khi reset lab). Loa mini tồn 0 để tái hiện F1 tự nhiên.",
+  "items": [
+    { "sku": "SKU-TAINGHE", "name": "Tai nghe Bluetooth", "price": 350000, "available": 10 },
+    { "sku": "SKU-BANPHIM", "name": "Bàn phím cơ", "price": 900000, "available": 5 },
+    { "sku": "SKU-CHUOT", "name": "Chuột không dây", "price": 200000, "available": 3 },
+    { "sku": "SKU-LOA", "name": "Loa mini", "price": 500000, "available": 0 }
+  ]
+}

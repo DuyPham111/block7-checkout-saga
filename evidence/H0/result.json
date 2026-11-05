@@ -60,13 +60,13 @@
       "refundTempFail": false,
       "resumed": false,
       "pids": [
-        15456
+        20796
       ]
     }
   },
   "snaps": [
     {
-      "at": "2026-11-05T04:00:04.391Z",
+      "at": "2026-11-05T08:16:23.389Z",
       "order_id": "O1",
       "source": {
         "order": "api",
@@ -85,8 +85,8 @@
         "terminal": true,
         "reason": null,
         "scenario": "H0",
-        "created_at": "2026-11-05T04:00:04.222Z",
-        "updated_at": "2026-11-05T04:00:04.251Z",
+        "created_at": "2026-11-05T08:16:23.196Z",
+        "updated_at": "2026-11-05T08:16:23.242Z",
         "saga": {
           "saga_id": "S1",
           "status": "CONFIRMED",
@@ -106,79 +106,79 @@
             "seq": 1,
             "saga_id": "S1",
             "order_id": "O1",
-            "at": "2026-11-05T04:00:04.222Z",
+            "at": "2026-11-05T08:16:23.196Z",
             "kind": "CREATE",
             "step": "create",
             "op_id": "S1:create",
             "from_status": null,
             "to_status": "PENDING",
             "detail": "Tạo đơn O1 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S1 trong 1 transaction",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 2,
             "saga_id": "S1",
             "order_id": "O1",
-            "at": "2026-11-05T04:00:04.226Z",
+            "at": "2026-11-05T08:16:23.219Z",
             "kind": "INTENT",
             "step": "reserve",
             "op_id": "S1:reserve",
             "from_status": "PENDING",
             "to_status": "PENDING",
             "detail": "Ghi intent \"reserve\" + op S1:reserve vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 3,
             "saga_id": "S1",
             "order_id": "O1",
-            "at": "2026-11-05T04:00:04.235Z",
+            "at": "2026-11-05T08:16:23.229Z",
             "kind": "OUTCOME",
             "step": "reserve",
             "op_id": "S1:reserve",
             "from_status": "PENDING",
             "to_status": "RESERVED",
             "detail": "Kho giữ hàng R1 (còn 9)",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 4,
             "saga_id": "S1",
             "order_id": "O1",
-            "at": "2026-11-05T04:00:04.238Z",
+            "at": "2026-11-05T08:16:23.231Z",
             "kind": "INTENT",
             "step": "charge",
             "op_id": "S1:charge",
             "from_status": "RESERVED",
             "to_status": "RESERVED",
             "detail": "Ghi intent \"charge\" + op S1:charge vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 5,
             "saga_id": "S1",
             "order_id": "O1",
-            "at": "2026-11-05T04:00:04.249Z",
+            "at": "2026-11-05T08:16:23.240Z",
             "kind": "OUTCOME",
             "step": "charge",
             "op_id": "S1:charge",
             "from_status": "RESERVED",
             "to_status": "CHARGED",
             "detail": "Ví đã trừ 350.000đ (charge C1) → tiếp tục xác nhận",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 6,
             "saga_id": "S1",
             "order_id": "O1",
-            "at": "2026-11-05T04:00:04.251Z",
+            "at": "2026-11-05T08:16:23.242Z",
             "kind": "OUTCOME",
             "step": "confirm",
             "op_id": "S1:confirm",
             "from_status": "CHARGED",
             "to_status": "CONFIRMED",
             "detail": "Xác nhận đơn: CONFIRMED (local transaction trong Order DB)",
-            "pid": 15456
+            "pid": 20796
           }
         ]
       },
@@ -192,7 +192,7 @@
           "status": "ACTIVE",
           "reserve_op_id": "S1:reserve",
           "release_op_id": null,
-          "created_at": "2026-11-05T04:00:04.228Z",
+          "created_at": "2026-11-05T08:16:23.226Z",
           "released_at": null
         }
       ],
@@ -209,7 +209,7 @@
           "reason": null,
           "balance_after": 1650000,
           "op_id": "S1:charge",
-          "at": "2026-11-05T04:00:04.242Z"
+          "at": "2026-11-05T08:16:23.236Z"
         }
       ],
       "label": "cuoi"
@@ -218,19 +218,19 @@
   "extra": {},
   "timeline": [
     {
-      "at": "2026-11-05T04:00:04.190Z",
+      "at": "2026-11-05T08:16:23.130Z",
       "event": "===== H0: Thành công ====="
     },
     {
-      "at": "2026-11-05T04:00:04.226Z",
+      "at": "2026-11-05T08:16:23.218Z",
       "event": "ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O1 / S1 (350000đ)"
     },
     {
-      "at": "2026-11-05T04:00:04.398Z",
-      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.391Z] Snapshot đơn O1\n  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R1 ACTIVE\n  Payment DB  (api): C1 charge 350000 CHARGED op=S1:charge"
+      "at": "2026-11-05T08:16:23.397Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T08:16:23.389Z] Snapshot đơn O1\n  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R1 ACTIVE\n  Payment DB  (api): C1 charge 350000 CHARGED op=S1:charge"
     },
     {
-      "at": "2026-11-05T04:00:04.398Z",
+      "at": "2026-11-05T08:16:23.398Z",
       "event": "ORACLE H0: ĐẠT 6/6"
     }
   ]

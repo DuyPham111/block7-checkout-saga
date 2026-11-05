@@ -1,39 +1,43 @@
-Kết quả test — 2026-11-05T04:16:40.370Z
+Kết quả test — 2026-11-05T08:16:05.025Z
 
 test/integration/recovery.test.js
-  ✓ F4 — kill Payment sau khi charge commit: RECOVERING khi Payment chết, rồi CONFIRMED với đúng 1 charge (4802 ms)
-  ✓ F5 — refund lỗi tạm thời: COMPENSATING + pending được lưu, gỡ lỗi thì refund 1 lần rồi release (3924 ms)
-  ✓ F6 — kill orchestrator tại khoảng hở: restart cùng DB, dùng lại op ID cũ, CONFIRMED, không nhân đôi (653 ms)
+  ✓ F4 — kill Payment sau khi charge commit: RECOVERING khi Payment chết, rồi CONFIRMED với đúng 1 charge (7905 ms)
+  ✓ F5 — refund lỗi tạm thời: COMPENSATING + pending được lưu, gỡ lỗi thì refund 1 lần rồi release (4985 ms)
+  ✓ F6 — kill orchestrator tại khoảng hở: restart cùng DB, dùng lại op ID cũ, CONFIRMED, không nhân đôi (664 ms)
 
 test/integration/saga.v1.test.js
-  ✓ H0 — thành công: CONFIRMED, 1 reservation ACTIVE, đúng 1 charge, không refund, không pending (258 ms)
-  ✓ F1 — kho từ chối (hết hàng): CANCELLED, không reservation, không gọi charge (240 ms)
-  ✓ F2 — ví không đủ tiền sau khi đã giữ hàng: CANCELLED, reservation RELEASED, không charge thành công, không refund (233 ms)
-  ✓ F3 — confirm bị từ chối sau charge: refund đúng 1 lần rồi mới release, lịch sử charge còn nguyên (219 ms)
+  ✓ H0 — thành công: CONFIRMED, 1 reservation ACTIVE, đúng 1 charge, không refund, không pending (242 ms)
+  ✓ F1 — kho từ chối (hết hàng): CANCELLED, không reservation, không gọi charge (220 ms)
+  ✓ F2 — ví không đủ tiền sau khi đã giữ hàng: CANCELLED, reservation RELEASED, không charge thành công, không refund (205 ms)
+  ✓ F3 — confirm bị từ chối sau charge: refund đúng 1 lần rồi mới release, lịch sử charge còn nguyên (215 ms)
+
+test/unit/openapi.test.js
+  ✓ mọi route trong code đều có trong OpenAPI và ngược lại (3 ms)
+  ✓ mỗi path chỉ đúng service sở hữu nó (servers theo cổng) (1 ms)
 
 test/integration/idempotency.test.js
-  ✓ reserve gửi lại cùng op → cùng reservation, kho chỉ trừ 1 lần (36 ms)
-  ✓ cùng op ID nhưng payload khác → 409 OP_PAYLOAD_MISMATCH (30 ms)
-  ✓ charge gửi lại cùng op → 1 dòng ledger, ví chỉ trừ 1 lần; query op trả SUCCEEDED (41 ms)
-  ✓ charge thiếu tiền → FAILED dứt khoát, ví không đổi, query op trả FAILED (33 ms)
-  ✓ refund: replay cùng op không hoàn 2 lần; op khác bị chặn ALREADY_REFUNDED; dòng charge vẫn còn (51 ms)
+  ✓ reserve gửi lại cùng op → cùng reservation, kho chỉ trừ 1 lần (32 ms)
+  ✓ cùng op ID nhưng payload khác → 409 OP_PAYLOAD_MISMATCH (25 ms)
+  ✓ charge gửi lại cùng op → 1 dòng ledger, ví chỉ trừ 1 lần; query op trả SUCCEEDED (35 ms)
+  ✓ charge thiếu tiền → FAILED dứt khoát, ví không đổi, query op trả FAILED (27 ms)
+  ✓ refund: replay cùng op không hoàn 2 lần; op khác bị chặn ALREADY_REFUNDED; dòng charge vẫn còn (37 ms)
 
 test/unit/machine.test.js
-  ✓ Đường thành công › PENDING → RESERVED → CHARGED → CONFIRMED (2 ms)
-  ✓ Đường thành công › op ID xác định từ saga: retry/restart luôn ra cùng ID (1 ms)
-  ✓ Thất bại dứt khoát và bù › F1: reserve bị từ chối → CANCELLED ngay, không có gì để bù, không đi charge (22 ms)
+  ✓ Đường thành công › PENDING → RESERVED → CHARGED → CONFIRMED (1 ms)
+  ✓ Đường thành công › op ID xác định từ saga: retry/restart luôn ra cùng ID (0 ms)
+  ✓ Thất bại dứt khoát và bù › F1: reserve bị từ chối → CANCELLED ngay, không có gì để bù, không đi charge (20 ms)
   ✓ Thất bại dứt khoát và bù › F2: charge FAILED → COMPENSATING chỉ cần release (1 ms)
-  ✓ Thất bại dứt khoát và bù › F3: confirm bị từ chối → pending [refund, release] (refund trước) (1 ms)
+  ✓ Thất bại dứt khoát và bù › F3: confirm bị từ chối → pending [refund, release] (refund trước) (2 ms)
   ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không release trước refund (2 ms)
-  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không cancel khi còn pending (1 ms)
+  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không cancel khi còn pending (2 ms)
   ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không refund khi chưa biết charge CHARGED (1 ms)
-  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không charge khi chưa giữ hàng (2 ms)
+  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không charge khi chưa giữ hàng (1 ms)
   ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › không confirm khi chưa CHARGED (1 ms)
-  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › saga đã kết thúc thì không nhận sự kiện nào (2 ms)
-  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › lỗi tạm khi bù: giữ COMPENSATING, pending không đổi (1 ms)
+  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › saga đã kết thúc thì không nhận sự kiện nào (0 ms)
+  ✓ Guard chặn chuyển trạng thái thiếu bằng chứng › lỗi tạm khi bù: giữ COMPENSATING, pending không đổi (0 ms)
   ✓ Kết quả chưa rõ (unknown outcome) › charge timeout → RECOVERING, GIỮ intent + op ID cũ (1 ms)
-  ✓ Kết quả chưa rõ (unknown outcome) › RECOVERING không có đường đi thẳng tới CANCELLED (không terminal giả) (5 ms)
+  ✓ Kết quả chưa rõ (unknown outcome) › RECOVERING không có đường đi thẳng tới CANCELLED (không terminal giả) (4 ms)
   ✓ Kết quả chưa rõ (unknown outcome) › RECOVERING + biết CHARGED → CHARGED (policy lab: tiếp tục confirm) (1 ms)
-  ✓ Kết quả chưa rõ (unknown outcome) › RECOVERING + biết FAILED → COMPENSATING [release] (1 ms)
+  ✓ Kết quả chưa rõ (unknown outcome) › RECOVERING + biết FAILED → COMPENSATING [release] (0 ms)
 
-Tests: 28 passed, 0 failed, 28 total · Suites: 4/4
+Tests: 30 passed, 0 failed, 30 total · Suites: 5/5

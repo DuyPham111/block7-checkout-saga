@@ -44,7 +44,7 @@
       {
         "label": "Chạy trên ≥ 2 process (PID khác nhau)",
         "ok": true,
-        "actual": "15456, 11928"
+        "actual": "20796, 12056"
       },
       {
         "label": "Charge dùng lại op ID cũ",
@@ -75,14 +75,14 @@
       "refundTempFail": false,
       "resumed": true,
       "pids": [
-        15456,
-        11928
+        20796,
+        12056
       ]
     }
   },
   "snaps": [
     {
-      "at": "2026-11-05T04:00:12.973Z",
+      "at": "2026-11-05T08:16:35.286Z",
       "order_id": "O7",
       "source": {
         "order": "db-file (Order không truy cập được: ECONNRESET)",
@@ -108,56 +108,56 @@
         },
         "steps": [
           {
-            "seq": 50,
+            "seq": 51,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.903Z",
+            "at": "2026-11-05T08:16:35.227Z",
             "kind": "CREATE",
             "step": "create",
             "op_id": "S7:create",
             "from_status": null,
             "to_status": "PENDING",
             "detail": "Tạo đơn O7 (1 × Chuột không dây, 200.000đ) + Saga record S7 trong 1 transaction",
-            "pid": 15456
+            "pid": 20796
           },
           {
-            "seq": 51,
+            "seq": 52,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.909Z",
+            "at": "2026-11-05T08:16:35.229Z",
             "kind": "INTENT",
             "step": "reserve",
             "op_id": "S7:reserve",
             "from_status": "PENDING",
             "to_status": "PENDING",
             "detail": "Ghi intent \"reserve\" + op S7:reserve vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
-            "seq": 52,
+            "seq": 53,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.914Z",
+            "at": "2026-11-05T08:16:35.235Z",
             "kind": "OUTCOME",
             "step": "reserve",
             "op_id": "S7:reserve",
             "from_status": "PENDING",
             "to_status": "RESERVED",
             "detail": "Kho giữ hàng R6 (còn 2)",
-            "pid": 15456
+            "pid": 20796
           },
           {
-            "seq": 53,
+            "seq": 54,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.916Z",
+            "at": "2026-11-05T08:16:35.238Z",
             "kind": "INTENT",
             "step": "charge",
             "op_id": "S7:charge",
             "from_status": "RESERVED",
             "to_status": "RESERVED",
             "detail": "Ghi intent \"charge\" + op S7:charge vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           }
         ]
       },
@@ -171,7 +171,7 @@
           "status": "ACTIVE",
           "reserve_op_id": "S7:reserve",
           "release_op_id": null,
-          "created_at": "2026-11-05T04:00:12.908Z",
+          "created_at": "2026-11-05T08:16:35.233Z",
           "released_at": null
         }
       ],
@@ -188,13 +188,13 @@
           "reason": null,
           "balance_after": 1100000,
           "op_id": "S7:charge",
-          "at": "2026-11-05T04:00:12.917Z"
+          "at": "2026-11-05T08:16:35.241Z"
         }
       ],
       "label": "sau-khi-dung"
     },
     {
-      "at": "2026-11-05T04:00:13.524Z",
+      "at": "2026-11-05T08:16:35.844Z",
       "order_id": "O7",
       "source": {
         "order": "api",
@@ -213,8 +213,8 @@
         "terminal": true,
         "reason": null,
         "scenario": "F6",
-        "created_at": "2026-11-05T04:00:12.903Z",
-        "updated_at": "2026-11-05T04:00:13.387Z",
+        "created_at": "2026-11-05T08:16:35.227Z",
+        "updated_at": "2026-11-05T08:16:35.717Z",
         "saga": {
           "saga_id": "S7",
           "status": "CONFIRMED",
@@ -231,95 +231,95 @@
         },
         "steps": [
           {
-            "seq": 50,
+            "seq": 51,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.903Z",
+            "at": "2026-11-05T08:16:35.227Z",
             "kind": "CREATE",
             "step": "create",
             "op_id": "S7:create",
             "from_status": null,
             "to_status": "PENDING",
             "detail": "Tạo đơn O7 (1 × Chuột không dây, 200.000đ) + Saga record S7 trong 1 transaction",
-            "pid": 15456
+            "pid": 20796
           },
           {
-            "seq": 51,
+            "seq": 52,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.909Z",
+            "at": "2026-11-05T08:16:35.229Z",
             "kind": "INTENT",
             "step": "reserve",
             "op_id": "S7:reserve",
             "from_status": "PENDING",
             "to_status": "PENDING",
             "detail": "Ghi intent \"reserve\" + op S7:reserve vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
-            "seq": 52,
+            "seq": 53,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.914Z",
+            "at": "2026-11-05T08:16:35.235Z",
             "kind": "OUTCOME",
             "step": "reserve",
             "op_id": "S7:reserve",
             "from_status": "PENDING",
             "to_status": "RESERVED",
             "detail": "Kho giữ hàng R6 (còn 2)",
-            "pid": 15456
+            "pid": 20796
           },
           {
-            "seq": 53,
+            "seq": 54,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:12.916Z",
+            "at": "2026-11-05T08:16:35.238Z",
             "kind": "INTENT",
             "step": "charge",
             "op_id": "S7:charge",
             "from_status": "RESERVED",
             "to_status": "RESERVED",
             "detail": "Ghi intent \"charge\" + op S7:charge vào Order DB trước khi gọi",
-            "pid": 15456
-          },
-          {
-            "seq": 54,
-            "saga_id": "S7",
-            "order_id": "O7",
-            "at": "2026-11-05T04:00:13.295Z",
-            "kind": "RESUME",
-            "step": null,
-            "op_id": "S7:charge",
-            "from_status": "RESERVED",
-            "to_status": "RESERVED",
-            "detail": "Order khởi động (pid 11928): đọc Saga record — RESERVED, intent charge S7:charge, pending [] → tiếp tục bằng op ID cũ",
-            "pid": 11928
+            "pid": 20796
           },
           {
             "seq": 55,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:13.382Z",
+            "at": "2026-11-05T08:16:35.625Z",
+            "kind": "RESUME",
+            "step": null,
+            "op_id": "S7:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Order khởi động (pid 12056): đọc Saga record — RESERVED, intent charge S7:charge, pending [] → tiếp tục bằng op ID cũ",
+            "pid": 12056
+          },
+          {
+            "seq": 56,
+            "saga_id": "S7",
+            "order_id": "O7",
+            "at": "2026-11-05T08:16:35.712Z",
             "kind": "OUTCOME",
             "step": "charge",
             "op_id": "S7:charge",
             "from_status": "RESERVED",
             "to_status": "CHARGED",
             "detail": "Ví đã trừ 200.000đ (charge C6) → tiếp tục xác nhận",
-            "pid": 11928
+            "pid": 12056
           },
           {
-            "seq": 56,
+            "seq": 57,
             "saga_id": "S7",
             "order_id": "O7",
-            "at": "2026-11-05T04:00:13.387Z",
+            "at": "2026-11-05T08:16:35.717Z",
             "kind": "OUTCOME",
             "step": "confirm",
             "op_id": "S7:confirm",
             "from_status": "CHARGED",
             "to_status": "CONFIRMED",
             "detail": "Xác nhận đơn: CONFIRMED (local transaction trong Order DB)",
-            "pid": 11928
+            "pid": 12056
           }
         ]
       },
@@ -333,7 +333,7 @@
           "status": "ACTIVE",
           "reserve_op_id": "S7:reserve",
           "release_op_id": null,
-          "created_at": "2026-11-05T04:00:12.908Z",
+          "created_at": "2026-11-05T08:16:35.233Z",
           "released_at": null
         }
       ],
@@ -350,57 +350,57 @@
           "reason": null,
           "balance_after": 1100000,
           "op_id": "S7:charge",
-          "at": "2026-11-05T04:00:12.917Z"
+          "at": "2026-11-05T08:16:35.241Z"
         }
       ],
       "label": "cuoi"
     }
   ],
   "extra": {
-    "recovery_ms": 535,
-    "oldPid": 15456,
-    "newPid": 11928,
+    "recovery_ms": 540,
+    "oldPid": 20796,
+    "newPid": 12056,
     "opBefore": "S7:charge"
   },
   "timeline": [
     {
-      "at": "2026-11-05T04:00:12.898Z",
+      "at": "2026-11-05T08:16:35.221Z",
       "event": "===== F6: Orchestrator chết tại khoảng hở ====="
     },
     {
-      "at": "2026-11-05T04:00:12.901Z",
+      "at": "2026-11-05T08:16:35.224Z",
       "event": "FAULT order: orchestrator.afterChargeCall=freeze (1 lần) → HTTP 200"
     },
     {
-      "at": "2026-11-05T04:00:12.909Z",
+      "at": "2026-11-05T08:16:35.229Z",
       "event": "ĐẶT HÀNG CUS-AN mua SKU-CHUOT → O7 / S7 (200000đ)"
     },
     {
-      "at": "2026-11-05T04:00:12.969Z",
-      "event": "MARKER order.charge.afterCall (pid 15456, op S7:charge, C6)"
+      "at": "2026-11-05T08:16:35.284Z",
+      "event": "MARKER order.charge.afterCall (pid 20796, op S7:charge, C6)"
     },
     {
-      "at": "2026-11-05T04:00:12.973Z",
-      "event": "KILL order pid=15456 (process thật bị dừng)"
+      "at": "2026-11-05T08:16:35.286Z",
+      "event": "KILL order pid=20796 (process thật bị dừng)"
     },
     {
-      "at": "2026-11-05T04:00:12.989Z",
-      "event": "SNAPSHOT sau-khi-dung\n[2026-11-05T04:00:12.973Z] Snapshot đơn O7\n  Order DB    (db-file (Order không truy cập được: ECONNRESET)): RESERVED  phase=charge  intent=charge S7:charge  pending=[]\n  Inventory DB(api): R6 ACTIVE\n  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge"
+      "at": "2026-11-05T08:16:35.303Z",
+      "event": "SNAPSHOT sau-khi-dung\n[2026-11-05T08:16:35.286Z] Snapshot đơn O7\n  Order DB    (db-file (Order không truy cập được: ECONNRESET)): RESERVED  phase=charge  intent=charge S7:charge  pending=[]\n  Inventory DB(api): R6 ACTIVE\n  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge"
     },
     {
-      "at": "2026-11-05T04:00:13.354Z",
-      "event": "START order pid=11928 (process mới, cùng file DB)"
+      "at": "2026-11-05T08:16:35.672Z",
+      "event": "START order pid=12056 (process mới, cùng file DB)"
     },
     {
-      "at": "2026-11-05T04:00:13.524Z",
-      "event": "Hội tụ sau 535ms kể từ khi start Order (pid 15456 → 11928), op trước restart S7:charge"
+      "at": "2026-11-05T08:16:35.843Z",
+      "event": "Hội tụ sau 540ms kể từ khi start Order (pid 20796 → 12056), op trước restart S7:charge"
     },
     {
-      "at": "2026-11-05T04:00:13.529Z",
-      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:13.524Z] Snapshot đơn O7\n  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R6 ACTIVE\n  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge"
+      "at": "2026-11-05T08:16:35.852Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T08:16:35.844Z] Snapshot đơn O7\n  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R6 ACTIVE\n  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge"
     },
     {
-      "at": "2026-11-05T04:00:13.529Z",
+      "at": "2026-11-05T08:16:35.853Z",
       "event": "ORACLE F6: ĐẠT 9/9"
     }
   ]

@@ -1,14 +1,14 @@
 # H0 — Thành công
 Đơn O1, saga S1. Oracle: CONFIRMED; 1 reservation ACTIVE; đúng 1 charge thành công, không refund; không pending.
 
-[2026-11-05T04:00:04.190Z] ===== H0: Thành công =====
-[2026-11-05T04:00:04.226Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O1 / S1 (350000đ)
-[2026-11-05T04:00:04.398Z] SNAPSHOT cuoi
-[2026-11-05T04:00:04.391Z] Snapshot đơn O1
+[2026-11-05T08:16:23.130Z] ===== H0: Thành công =====
+[2026-11-05T08:16:23.218Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O1 / S1 (350000đ)
+[2026-11-05T08:16:23.397Z] SNAPSHOT cuoi
+[2026-11-05T08:16:23.389Z] Snapshot đơn O1
   Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
   Inventory DB(api): R1 ACTIVE
   Payment DB  (api): C1 charge 350000 CHARGED op=S1:charge
-[2026-11-05T04:00:04.398Z] ORACLE H0: ĐẠT 6/6
+[2026-11-05T08:16:23.398Z] ORACLE H0: ĐẠT 6/6
 
 Kiểm tra oracle:
   ✓ Order CONFIRMED (CONFIRMED)

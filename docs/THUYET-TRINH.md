@@ -20,7 +20,7 @@
    ```
 3. Trình duyệt tab 1: http://127.0.0.1:3000/slides/#1, bấm `F` để toàn màn hình. Tab 2: http://127.0.0.1:3000 (app, tab **Mua hàng**, khách **Nguyễn Văn An**).
 4. Terminal để sẵn, chữ to. Đóng mọi cửa sổ khác.
-5. Kiểm tra trước (đã làm ở nhà): `evidence/test-output.txt` có 28 passed, `evidence/SUMMARY.md` có 7 dòng ĐẠT.
+5. Kiểm tra trước (đã làm ở nhà): `evidence/test-output.txt` có 30 passed, `evidence/SUMMARY.md` có 7 dòng ĐẠT.
 
 **Chia vai** (nếu nhóm muốn nhiều người cùng nói; một người nói hết cũng được):
 
@@ -302,7 +302,7 @@
 
 > "Về bằng chứng: *(app, tab Ma trận, bấm Chạy H0, F1, F2)* ba kịch bản đầu em vừa mua ở góc khách hàng, giờ em chạy lại từ ma trận để hệ thống gắn nhãn và chấm. Bảy kịch bản H0 và F1 đến F6 đều **đạt oracle**. Oracle kiểm bằng dữ liệu đọc qua API của **cả ba kho**, không chỉ nhìn HTTP response.
 >
-> *(slide 16)* Nhóm em có **28 test, tất cả đều xanh**, chia bốn nhóm. 16 unit test cho state machine và guard. 5 test idempotency: gửi lại cùng op thì không tạo tác động thứ hai, khác nội dung thì 409, refund chỉ một lần. 4 test **H0, F1, F2, F3** theo yêu cầu V1, assert cả Order, Inventory, Payment, và kiểm toàn bộ ledger để chắc chắn không có charge hay refund ngoài dự kiến. Ngoài yêu cầu, nhóm em tự động hóa thêm F4, F5, F6, có **kill process thật** ngay trong test.
+> *(slide 16)* Nhóm em có **30 test, tất cả đều xanh**, chia năm nhóm. 16 unit test cho state machine và guard. 2 test bảo đảm tài liệu Swagger khớp đúng các route trong code. 5 test idempotency: gửi lại cùng op thì không tạo tác động thứ hai, khác nội dung thì 409, refund chỉ một lần. 4 test **H0, F1, F2, F3** theo yêu cầu V1, assert cả Order, Inventory, Payment, và kiểm toàn bộ ledger để chắc chắn không có charge hay refund ngoài dự kiến. Ngoài yêu cầu, nhóm em tự động hóa thêm F4, F5, F6, có **kill process thật** ngay trong test.
 >
 > Bảng bên phải lấy từ file `evidence/SUMMARY.md`. Thời gian hội tụ đo được: F4 khoảng 0,7 đến 4 giây sau khi Payment sống lại, tùy đang ở nấc backoff nào; F5 khoảng 1,3 giây sau khi gỡ lỗi; F6 khoảng 0,5 giây sau khi Order khởi động lại. Mỗi kịch bản đều có timeline kèm marker, PID, operation ID và snapshot ba kho trong thư mục evidence."
 
@@ -345,7 +345,7 @@
 | 5 | Đoạn 10 | F3 (refund là dòng mới) |
 | 6 | Đoạn 11 | **F4 đầy đủ** |
 | 7 | Đoạn 13 | F6: kill → start → chỉ bước RESUME và PID khác |
-| 8 | Đoạn 14 | Chỉ câu "28 test xanh, 7/7 kịch bản đạt oracle" |
+| 8 | Đoạn 14 | Chỉ câu "30 test xanh, 7/7 kịch bản đạt oracle" |
 | 9 | Đoạn 16 | Ba điều rút ra + cảm ơn |
 
 F1, F2, F5 nói một câu trên slide 13/15: *"F1, F2 là thất bại tự nhiên, khách không mất tiền; F5 là bước bù lỗi tạm thời, đơn giữ COMPENSATING tới khi hoàn tiền xong. Bằng chứng nằm ở ma trận."*

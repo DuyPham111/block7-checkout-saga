@@ -65,8 +65,11 @@ async function main() {
       return status();
     case 'reset': {
       await kill('all', 'STOP');
-      for (const dir of [cfg.DATA_DIR, path.join(cfg.RUN_DIR, 'markers')]) fs.rmSync(dir, { recursive: true, force: true, maxRetries: 20, retryDelay: 250 }); // Windows nhả khóa file chậm sau khi kill
-      say('RESET đã xóa data/*.db và run/markers — khởi động lại với dữ liệu seed');
+      // Chỉ xóa file DB lúc chạy (giữ data/seed/*.json). Windows nhả khóa file chậm sau khi kill => retry.
+      const dbFiles = fs.existsSync(cfg.DATA_DIR) ? fs.readdirSync(cfg.DATA_DIR).filter((f) => /\.db(-wal|-shm)?$/.test(f)) : [];
+      for (const f of dbFiles) fs.rmSync(path.join(cfg.DATA_DIR, f), { force: true, maxRetries: 20, retryDelay: 250 });
+      fs.rmSync(path.join(cfg.RUN_DIR, 'markers'), { recursive: true, force: true, maxRetries: 20, retryDelay: 250 });
+      say('RESET đã xóa data/*.db và run/markers — khởi động lại với dữ liệu từ data/seed/*.json');
       return start('all');
     }
     case 'resume': {

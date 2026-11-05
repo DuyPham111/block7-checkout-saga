@@ -55,13 +55,13 @@
       "refundTempFail": false,
       "resumed": false,
       "pids": [
-        15456
+        20796
       ]
     }
   },
   "snaps": [
     {
-      "at": "2026-11-05T04:00:04.757Z",
+      "at": "2026-11-05T08:16:23.760Z",
       "order_id": "O3",
       "source": {
         "order": "api",
@@ -80,8 +80,8 @@
         "terminal": true,
         "reason": "INSUFFICIENT_FUNDS",
         "scenario": "F2",
-        "created_at": "2026-11-05T04:00:04.590Z",
-        "updated_at": "2026-11-05T04:00:04.638Z",
+        "created_at": "2026-11-05T08:16:23.584Z",
+        "updated_at": "2026-11-05T08:16:23.619Z",
         "saga": {
           "saga_id": "S3",
           "status": "CANCELLED",
@@ -101,105 +101,105 @@
             "seq": 10,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.590Z",
+            "at": "2026-11-05T08:16:23.584Z",
             "kind": "CREATE",
             "step": "create",
             "op_id": "S3:create",
             "from_status": null,
             "to_status": "PENDING",
             "detail": "Tạo đơn O3 (1 × Bàn phím cơ, 900.000đ) + Saga record S3 trong 1 transaction",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 11,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.596Z",
+            "at": "2026-11-05T08:16:23.590Z",
             "kind": "INTENT",
             "step": "reserve",
             "op_id": "S3:reserve",
             "from_status": "PENDING",
             "to_status": "PENDING",
             "detail": "Ghi intent \"reserve\" + op S3:reserve vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 12,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.605Z",
+            "at": "2026-11-05T08:16:23.597Z",
             "kind": "OUTCOME",
             "step": "reserve",
             "op_id": "S3:reserve",
             "from_status": "PENDING",
             "to_status": "RESERVED",
             "detail": "Kho giữ hàng R2 (còn 4)",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 13,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.608Z",
+            "at": "2026-11-05T08:16:23.599Z",
             "kind": "INTENT",
             "step": "charge",
             "op_id": "S3:charge",
             "from_status": "RESERVED",
             "to_status": "RESERVED",
             "detail": "Ghi intent \"charge\" + op S3:charge vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 14,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.621Z",
+            "at": "2026-11-05T08:16:23.606Z",
             "kind": "OUTCOME",
             "step": "charge",
             "op_id": "S3:charge",
             "from_status": "RESERVED",
             "to_status": "COMPENSATING",
             "detail": "Thanh toán thất bại dứt khoát (INSUFFICIENT_FUNDS), ví không bị trừ → bù: nhả hàng",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 15,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.624Z",
+            "at": "2026-11-05T08:16:23.608Z",
             "kind": "INTENT",
             "step": "release",
             "op_id": "S3:release",
             "from_status": "COMPENSATING",
             "to_status": "COMPENSATING",
             "detail": "Ghi intent \"release\" + op S3:release vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 16,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.634Z",
+            "at": "2026-11-05T08:16:23.616Z",
             "kind": "OUTCOME",
             "step": "release",
             "op_id": "S3:release",
             "from_status": "COMPENSATING",
             "to_status": "COMPENSATING",
             "detail": "Nhả hàng R2 về kho (còn 5)",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 17,
             "saga_id": "S3",
             "order_id": "O3",
-            "at": "2026-11-05T04:00:04.639Z",
+            "at": "2026-11-05T08:16:23.619Z",
             "kind": "OUTCOME",
             "step": "cancel",
             "op_id": "S3:cancel",
             "from_status": "COMPENSATING",
             "to_status": "CANCELLED",
             "detail": "Hủy đơn: CANCELLED (mọi tác động đã được bù xong)",
-            "pid": 15456
+            "pid": 20796
           }
         ]
       },
@@ -213,8 +213,8 @@
           "status": "RELEASED",
           "reserve_op_id": "S3:reserve",
           "release_op_id": "S3:release",
-          "created_at": "2026-11-05T04:00:04.597Z",
-          "released_at": "2026-11-05T04:00:04.626Z"
+          "created_at": "2026-11-05T08:16:23.594Z",
+          "released_at": "2026-11-05T08:16:23.612Z"
         }
       ],
       "ledger": [
@@ -230,7 +230,7 @@
           "reason": "INSUFFICIENT_FUNDS",
           "balance_after": 300000,
           "op_id": "S3:charge",
-          "at": "2026-11-05T04:00:04.611Z"
+          "at": "2026-11-05T08:16:23.602Z"
         }
       ],
       "label": "cuoi"
@@ -239,19 +239,19 @@
   "extra": {},
   "timeline": [
     {
-      "at": "2026-11-05T04:00:04.583Z",
+      "at": "2026-11-05T08:16:23.580Z",
       "event": "===== F2: Thanh toán thất bại (ví không đủ) ====="
     },
     {
-      "at": "2026-11-05T04:00:04.596Z",
+      "at": "2026-11-05T08:16:23.590Z",
       "event": "ĐẶT HÀNG CUS-BINH mua SKU-BANPHIM → O3 / S3 (900000đ)"
     },
     {
-      "at": "2026-11-05T04:00:04.762Z",
-      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.757Z] Snapshot đơn O3\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R2 RELEASED\n  Payment DB  (api): C2 charge 900000 FAILED op=S3:charge"
+      "at": "2026-11-05T08:16:23.767Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T08:16:23.760Z] Snapshot đơn O3\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R2 RELEASED\n  Payment DB  (api): C2 charge 900000 FAILED op=S3:charge"
     },
     {
-      "at": "2026-11-05T04:00:04.763Z",
+      "at": "2026-11-05T08:16:23.768Z",
       "event": "ORACLE F2: ĐẠT 5/5"
     }
   ]

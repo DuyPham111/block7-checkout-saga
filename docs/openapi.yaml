@@ -1,0 +1,455 @@
+openapi: 3.1.0
+info:
+  title: Saga Shop — Checkout Saga (Block 7)
+  version: 1.0.0
+  description: |
+    Ba service HTTP, mỗi service một process và một database riêng. Order chứa orchestrator.
+    Mỗi thao tác ghi đều idempotent theo **operation ID**: gửi lại cùng op và cùng nội dung thì nhận lại kết quả cũ;
+    cùng op mà khác nội dung thì `409 OP_PAYLOAD_MISMATCH`.
+
+    Trạng thái operation: `SUCCEEDED | FAILED | PENDING`, hoặc `404 NOT_FOUND`.
+    `FAILED` nghĩa là operation không bao giờ commit về sau; timeout hay 5xx **không** phải FAILED.
+
+    Swagger UI chạy ở cổng 3000; mỗi path có `servers` trỏ đúng service (3001 / 3002 / 3003).
+    Các service bật CORS cho `http://127.0.0.1:3000` nên dùng được "Try it out".
+servers:
+  - url: http://127.0.0.1:3001
+    description: Order
+tags:
+  - name: Order
+    description: Đơn hàng, Saga record, resume (process 1, data/order.db)
+  - name: Inventory
+    description: Tồn kho, reservation, lịch sử vào/ra (process 2, data/inventory.db)
+  - name: Payment
+    description: Ví, ledger charge/refund/nạp tiền (process 3, data/payment.db)
+  - name: Chung
+    description: Có ở cả ba service
+  - name: Lab
+    description: Fault hook và reset, chỉ bật khi LAB_FAULTS=1 (mặc định trong lab)
+
+x-order-server: &order
+  - url: http://127.0.0.1:3001
+    description: Order
+x-inventory-server: &inventory
+  - url: http://127.0.0.1:3002
+    description: Inventory
+x-payment-server: &payment
+  - url: http://127.0.0.1:3003
+    description: Payment
+x-all-servers: &all
+  - url: http://127.0.0.1:3001
+    description: Order
+  - url: http://127.0.0.1:3002
+    description: Inventory
+  - url: http://127.0.0.1:3003
+    description: Payment
+
+paths:
+  # ------------------------------------------------------------------ Chung
+  /health:
+    servers: *all
+    get:
+      tags: [Chung]
+      summary: Trạng thái process (dùng cho UI và script lab)
+      responses:
+        '200':
+          description: Đang chạy
+          content:
+            application/json:
+              example: { service: payment, status: UP, pid: 11156, started_at: '2026-11-05T08:01:46.000Z' }
+
+  /__lab/faults:
+    servers: *all
+    get:
+      tags: [Lab]
+      summary: Liệt kê fault đang bật
+      responses:
+        '200': { description: Danh sách fault }
+    post:
+      tags: [Lab]
+      summary: Bật một fault hook
+      description: |
+        | Service | point | mode | Dùng cho |
+        | --- | --- | --- | --- |
+        | Inventory | `reserve` | `reject` | F1 (dự phòng) |
+        | Inventory | `release` | `error503` | bù lỗi tạm |
+        | Payment | `charge` | `fail` | F2 (dự phòng) |
+        | Payment | `charge.afterCommit` | `freeze` | F4 |
+        | Payment | `refund` | `error503` | F5 (times = null: giữ tới khi gỡ) |
+        | Order | `confirm` | `reject` | F3, F5 |
+        | Order | `orchestrator.afterChargeCall` | `freeze` | F6 |
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [point, mode]
+              properties:
+                point: { type: string }
+                mode: { type: string }
+                times: { type: [integer, 'null'], default: 1 }
+            example: { point: charge.afterCommit, mode: freeze, times: 1 }
+      responses:
+        '200': { description: Đã bật }
+        '400': { description: Thiếu point hoặc mode }
+    delete:
+      tags: [Lab]
+      summary: Gỡ fault (một point hoặc tất cả)
+      parameters:
+        - { name: point, in: query, required: false, schema: { type: string } }
+      responses:
+        '200': { description: Đã gỡ }
+
+  /__lab/reset:
+    servers: *all
+    post:
+      tags: [Lab]
+      summary: Xóa dữ liệu của service và nạp lại từ data/seed
+      responses:
+        '200': { description: Đã reset }
+
+  # ------------------------------------------------------------------ Order
+  /orders:
+    servers: *order
+    post:
+      tags: [Order]
+      summary: Khách đặt hàng — tạo đơn + Saga record trong 1 local transaction, Saga chạy nền
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, sku]
+              properties:
+                customer_id: { type: string, example: CUS-AN }
+                sku: { type: string, example: SKU-TAINGHE }
+                quantity: { type: integer, minimum: 1, default: 1 }
+                scenario: { type: string, description: Nhãn kịch bản (H0, F1…) cho tab Ma trận }
+                create_op_id: { type: string, description: Gửi lại cùng giá trị thì nhận lại đơn cũ }
+      responses:
+        '202':
+          description: Đã nhận, Saga đang chạy
+          content:
+            application/json:
+              example: { order_id: O1, saga_id: S1, status: PENDING, amount: 350000 }
+        '200': { description: Gửi lại cùng create_op_id — trả đơn cũ (replayed) }
+        '400': { description: Thiếu trường hoặc SKU không tồn tại }
+        '503': { description: Không đọc được giá từ Inventory — chưa tạo đơn }
+    get:
+      tags: [Order]
+      summary: Lịch sử đơn (kèm Saga record)
+      parameters:
+        - { name: customer_id, in: query, schema: { type: string } }
+        - { name: group, in: query, schema: { type: string, enum: [success, cancelled, active] } }
+        - { name: scenario, in: query, schema: { type: string } }
+      responses:
+        '200': { description: Danh sách đơn và số đơn theo trạng thái }
+
+  /orders/{id}:
+    servers: *order
+    get:
+      tags: [Order]
+      summary: Một đơn
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, example: O1 } }
+      responses:
+        '200':
+          description: Đơn + saga
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Order' }
+        '404': { description: Không có đơn }
+
+  /orders/{id}/saga:
+    servers: *order
+    get:
+      tags: [Order]
+      summary: Đơn + Saga record + toàn bộ các bước (seq, kind, op_id, pid)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, example: O1 } }
+      responses:
+        '200': { description: 'Đơn kèm steps[]' }
+        '404': { description: Không có đơn }
+
+  /sagas:
+    servers: *order
+    get:
+      tags: [Order]
+      summary: Các saga chưa kết thúc (RECOVERING, COMPENSATING…)
+      responses:
+        '200': { description: Danh sách }
+
+  /sagas/{saga_id}/resume:
+    servers: *order
+    post:
+      tags: [Order]
+      summary: Tiếp tục theo saga_id từ durable record (không tạo checkout mới, không đổi op ID)
+      parameters:
+        - { name: saga_id, in: path, required: true, schema: { type: string, example: S6 } }
+      responses:
+        '200': { description: Trạng thái sau khi resume }
+        '404': { description: Không có saga }
+
+  # ------------------------------------------------------------------ Inventory
+  /inventory/items:
+    servers: *inventory
+    get:
+      tags: [Inventory]
+      summary: Tồn kho hiện tại (khả dụng, đang giữ)
+      responses:
+        '200': { description: Danh sách sản phẩm }
+
+  /inventory/items/{sku}:
+    servers: *inventory
+    get:
+      tags: [Inventory]
+      summary: Một sản phẩm (Order đọc giá khi tạo đơn)
+      parameters:
+        - { name: sku, in: path, required: true, schema: { type: string, example: SKU-TAINGHE } }
+      responses:
+        '200': { description: Sản phẩm }
+        '404': { description: SKU_NOT_FOUND }
+
+  /inventory/items/{sku}/restock:
+    servers: *inventory
+    post:
+      tags: [Inventory]
+      summary: Thủ kho nhập hàng (hàng vào)
+      parameters:
+        - { name: sku, in: path, required: true, schema: { type: string, example: SKU-LOA } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [quantity], properties: { quantity: { type: integer, minimum: 1 }, note: { type: string } } }
+      responses:
+        '201': { description: Tồn mới }
+        '400': { description: quantity không hợp lệ }
+        '404': { description: Không có sản phẩm }
+
+  /inventory/reservations:
+    servers: *inventory
+    post:
+      tags: [Inventory]
+      summary: Bước tiến — giữ hàng cho đơn (idempotent theo reserve_op_id)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [order_id, sku, quantity, reserve_op_id]
+              properties:
+                order_id: { type: string, example: O1 }
+                sku: { type: string, example: SKU-TAINGHE }
+                quantity: { type: integer, minimum: 1, example: 1 }
+                reserve_op_id: { type: string, example: 'S1:reserve' }
+      responses:
+        '201':
+          description: Đã giữ hàng
+          content:
+            application/json:
+              example: { reservation_id: R1, status: ACTIVE, order_id: O1, sku: SKU-TAINGHE, quantity: 1, available: 9 }
+        '409':
+          description: REJECTED (hết hàng — thất bại dứt khoát) hoặc OP_PAYLOAD_MISMATCH
+          content:
+            application/json:
+              example: { error: REJECTED, status: REJECTED, reason: OUT_OF_STOCK }
+        '400': { description: Thiếu trường }
+    get:
+      tags: [Inventory]
+      summary: Reservation (lọc theo order_id)
+      parameters:
+        - { name: order_id, in: query, schema: { type: string } }
+      responses:
+        '200': { description: Danh sách reservation }
+
+  /inventory/reservations/{id}/release:
+    servers: *inventory
+    post:
+      tags: [Inventory]
+      summary: Bước bù — nhả hàng về kho (gửi lại không cộng kho hai lần)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, example: R1 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [release_op_id], properties: { release_op_id: { type: string, example: 'S3:release' } } }
+      responses:
+        '200': { description: RELEASED (hoặc đã nhả từ trước — already true) }
+        '404': { description: RESERVATION_NOT_FOUND }
+        '503': { description: Lỗi tạm thời (fault) — thử lại cùng op }
+
+  /inventory/movements:
+    servers: *inventory
+    get:
+      tags: [Inventory]
+      summary: Lịch sử vào/ra kho (RESTOCK, RESERVE, RELEASE)
+      parameters:
+        - { name: sku, in: query, schema: { type: string } }
+        - { name: order_id, in: query, schema: { type: string } }
+      responses:
+        '200': { description: Danh sách biến động }
+
+  /inventory/operations/{op_id}:
+    servers: *inventory
+    get:
+      tags: [Inventory]
+      summary: Kết quả bền vững của đúng một operation
+      parameters:
+        - { name: op_id, in: path, required: true, schema: { type: string, example: 'S1:reserve' } }
+      responses:
+        '200':
+          description: SUCCEEDED / FAILED
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Operation' }
+        '404': { description: NOT_FOUND — chưa thấy ở lần hỏi này (chưa phải kết luận) }
+
+  # ------------------------------------------------------------------ Payment
+  /payments/charges:
+    servers: *payment
+    post:
+      tags: [Payment]
+      summary: Bước tiến — thu tiền từ ví (idempotent theo charge_op_id)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [order_id, customer_id, amount, charge_op_id]
+              properties:
+                order_id: { type: string, example: O1 }
+                customer_id: { type: string, example: CUS-AN }
+                amount: { type: integer, minimum: 1, example: 350000 }
+                charge_op_id: { type: string, example: 'S1:charge' }
+      responses:
+        '201':
+          description: CHARGED
+          content:
+            application/json:
+              example: { charge_id: C1, status: CHARGED, order_id: O1, amount: 350000, balance: 1650000 }
+        '402':
+          description: FAILED dứt khoát (INSUFFICIENT_FUNDS, WALLET_NOT_FOUND…) — ví không đổi, ledger có dòng FAILED
+        '409': { description: OP_PAYLOAD_MISMATCH }
+
+  /payments/charges/{id}/refund:
+    servers: *payment
+    post:
+      tags: [Payment]
+      summary: Bước bù — hoàn tiền (dòng ledger MỚI tham chiếu charge; charge giữ nguyên)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, example: C3 } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [refund_op_id], properties: { refund_op_id: { type: string, example: 'S4:refund' } } }
+      responses:
+        '201':
+          description: REFUNDED
+          content:
+            application/json:
+              example: { refund_id: RF1, charge_id: C3, status: REFUNDED, amount: 350000, balance: 2000000 }
+        '409': { description: ALREADY_REFUNDED / NOT_REFUNDABLE / OP_PAYLOAD_MISMATCH }
+        '503': { description: Lỗi tạm thời (fault F5) — không commit gì, thử lại cùng op }
+
+  /payments/operations/{op_id}:
+    servers: *payment
+    get:
+      tags: [Payment]
+      summary: Kết quả bền vững của đúng một operation (orchestrator hỏi khi RECOVERING)
+      parameters:
+        - { name: op_id, in: path, required: true, schema: { type: string, example: 'S5:charge' } }
+      responses:
+        '200':
+          description: SUCCEEDED / FAILED
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Operation' }
+        '404': { description: NOT_FOUND — chưa thấy ở lần hỏi này (chưa phải kết luận) }
+
+  /payments/ledger:
+    servers: *payment
+    get:
+      tags: [Payment]
+      summary: Sổ cái (chỉ INSERT) + tổng đã thu / đã hoàn / thu ròng
+      parameters:
+        - { name: customer_id, in: query, schema: { type: string } }
+        - { name: order_id, in: query, schema: { type: string } }
+      responses:
+        '200': { description: 'entries[], total_charged, total_refunded, net_collected' }
+
+  /payments/wallets:
+    servers: *payment
+    get:
+      tags: [Payment]
+      summary: Số dư ví của các khách
+      responses:
+        '200': { description: Danh sách ví }
+
+  /payments/wallets/{id}:
+    servers: *payment
+    get:
+      tags: [Payment]
+      summary: Một ví + giao dịch của khách
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, example: CUS-AN } }
+      responses:
+        '200': { description: 'Ví + entries[]' }
+        '404': { description: WALLET_NOT_FOUND }
+
+  /payments/wallets/{id}/topup:
+    servers: *payment
+    post:
+      tags: [Payment]
+      summary: Nạp tiền vào ví
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string, example: CUS-BINH } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [amount], properties: { amount: { type: integer, minimum: 1, example: 500000 } } }
+      responses:
+        '201': { description: Số dư mới }
+        '400': { description: amount không hợp lệ }
+        '404': { description: WALLET_NOT_FOUND }
+
+components:
+  schemas:
+    Operation:
+      type: object
+      properties:
+        op_id: { type: string, example: 'S5:charge' }
+        kind: { type: string, example: charge }
+        status: { type: string, enum: [SUCCEEDED, FAILED, PENDING] }
+        result: { type: object }
+        at: { type: string, format: date-time }
+    Order:
+      type: object
+      properties:
+        order_id: { type: string }
+        customer_id: { type: string }
+        sku: { type: string }
+        item_name: { type: string }
+        quantity: { type: integer }
+        amount: { type: integer }
+        status: { type: string, enum: [PENDING, RESERVED, CHARGED, CONFIRMED, RECOVERING, COMPENSATING, CANCELLED] }
+        terminal: { type: boolean }
+        reason: { type: [string, 'null'] }
+        saga:
+          type: object
+          properties:
+            saga_id: { type: string }
+            phase: { type: string }
+            intent: { type: [object, 'null'], properties: { step: { type: string }, op_id: { type: string } } }
+            pending: { type: array, items: { type: string, enum: [refund, release] } }
+            reservation_id: { type: [string, 'null'] }
+            charge_id: { type: [string, 'null'] }
+            refund_id: { type: [string, 'null'] }
+            last_error: { type: [string, 'null'] }

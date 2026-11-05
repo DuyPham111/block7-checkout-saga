@@ -1,0 +1,8 @@
+{
+  "_mo_ta": "Dữ liệu ban đầu của Payment service (ví khách hàng). Trần Thị Bình chỉ có 300.000đ để tái hiện F2 (ví không đủ tiền) tự nhiên.",
+  "wallets": [
+    { "customer_id": "CUS-AN", "name": "Nguyễn Văn An", "balance": 2000000 },
+    { "customer_id": "CUS-BINH", "name": "Trần Thị Bình", "balance": 300000 },
+    { "customer_id": "CUS-CUONG", "name": "Lê Minh Cường", "balance": 1000000 }
+  ]
+}

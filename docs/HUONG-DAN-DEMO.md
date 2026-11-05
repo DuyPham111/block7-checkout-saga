@@ -12,7 +12,7 @@ Mở terminal tại thư mục `W7/block7-saga`. Gõ đúng từng lệnh dướ
    ```bash
    npm install
    ```
-2. Chạy toàn bộ test và lưu kết quả. Phải thấy `Tests: 28 passed`.
+2. Chạy toàn bộ test và lưu kết quả. Phải thấy `Tests: 30 passed`.
    ```bash
    npm run test:report
    ```
@@ -159,7 +159,7 @@ Mở terminal tại thư mục `W7/block7-saga`. Gõ đúng từng lệnh dướ
 ### D8 — Bằng chứng tổng (30 giây)
 
 - Tab **Ma trận**: H0, F1, F2 mua ở tab Mua hàng nên chưa có nhãn kịch bản. Bấm **Chạy** ở hàng H0, F1, F2 (mỗi đơn xong dưới 1 giây), rồi cả 7 dòng hiện **ĐẠT**.
-- Mở `evidence/test-output.txt` (28/28 test) và `evidence/SUMMARY.md`. Nếu còn thời gian, chạy `npm test` (khoảng 15 giây).
+- Mở `evidence/test-output.txt` (30/30 test) và `evidence/SUMMARY.md`. Nếu còn thời gian, chạy `npm test` (khoảng 15 giây).
 
 ---
 

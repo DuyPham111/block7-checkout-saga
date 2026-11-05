@@ -53,13 +53,13 @@
       "refundTempFail": false,
       "resumed": false,
       "pids": [
-        15456
+        20796
       ]
     }
   },
   "snaps": [
     {
-      "at": "2026-11-05T04:00:04.572Z",
+      "at": "2026-11-05T08:16:23.573Z",
       "order_id": "O2",
       "source": {
         "order": "api",
@@ -78,8 +78,8 @@
         "terminal": true,
         "reason": "OUT_OF_STOCK",
         "scenario": "F1",
-        "created_at": "2026-11-05T04:00:04.406Z",
-        "updated_at": "2026-11-05T04:00:04.417Z",
+        "created_at": "2026-11-05T08:16:23.404Z",
+        "updated_at": "2026-11-05T08:16:23.417Z",
         "saga": {
           "saga_id": "S2",
           "status": "CANCELLED",
@@ -99,40 +99,40 @@
             "seq": 7,
             "saga_id": "S2",
             "order_id": "O2",
-            "at": "2026-11-05T04:00:04.406Z",
+            "at": "2026-11-05T08:16:23.404Z",
             "kind": "CREATE",
             "step": "create",
             "op_id": "S2:create",
             "from_status": null,
             "to_status": "PENDING",
             "detail": "Tạo đơn O2 (1 × Loa mini, 500.000đ) + Saga record S2 trong 1 transaction",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 8,
             "saga_id": "S2",
             "order_id": "O2",
-            "at": "2026-11-05T04:00:04.410Z",
+            "at": "2026-11-05T08:16:23.410Z",
             "kind": "INTENT",
             "step": "reserve",
             "op_id": "S2:reserve",
             "from_status": "PENDING",
             "to_status": "PENDING",
             "detail": "Ghi intent \"reserve\" + op S2:reserve vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 9,
             "saga_id": "S2",
             "order_id": "O2",
-            "at": "2026-11-05T04:00:04.417Z",
+            "at": "2026-11-05T08:16:23.417Z",
             "kind": "OUTCOME",
             "step": "reserve",
             "op_id": "S2:reserve",
             "from_status": "PENDING",
             "to_status": "CANCELLED",
             "detail": "Kho từ chối dứt khoát (OUT_OF_STOCK) → không gọi thu tiền, chưa có gì để bù → hủy đơn",
-            "pid": 15456
+            "pid": 20796
           }
         ]
       },
@@ -144,19 +144,19 @@
   "extra": {},
   "timeline": [
     {
-      "at": "2026-11-05T04:00:04.400Z",
+      "at": "2026-11-05T08:16:23.399Z",
       "event": "===== F1: Kho từ chối (hết hàng) ====="
     },
     {
-      "at": "2026-11-05T04:00:04.410Z",
+      "at": "2026-11-05T08:16:23.410Z",
       "event": "ĐẶT HÀNG CUS-AN mua SKU-LOA → O2 / S2 (500000đ)"
     },
     {
-      "at": "2026-11-05T04:00:04.581Z",
-      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.572Z] Snapshot đơn O2\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): không có reservation\n  Payment DB  (api): ledger trống"
+      "at": "2026-11-05T08:16:23.579Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T08:16:23.573Z] Snapshot đơn O2\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): không có reservation\n  Payment DB  (api): ledger trống"
     },
     {
-      "at": "2026-11-05T04:00:04.582Z",
+      "at": "2026-11-05T08:16:23.579Z",
       "event": "ORACLE F1: ĐẠT 5/5"
     }
   ]

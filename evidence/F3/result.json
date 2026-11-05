@@ -65,13 +65,13 @@
       "refundTempFail": false,
       "resumed": false,
       "pids": [
-        15456
+        20796
       ]
     }
   },
   "snaps": [
     {
-      "at": "2026-11-05T04:00:04.936Z",
+      "at": "2026-11-05T08:16:23.955Z",
       "order_id": "O4",
       "source": {
         "order": "api",
@@ -90,8 +90,8 @@
         "terminal": true,
         "reason": "CONFIRM_REJECTED",
         "scenario": "F3",
-        "created_at": "2026-11-05T04:00:04.772Z",
-        "updated_at": "2026-11-05T04:00:04.814Z",
+        "created_at": "2026-11-05T08:16:23.780Z",
+        "updated_at": "2026-11-05T08:16:23.832Z",
         "saga": {
           "saga_id": "S4",
           "status": "CANCELLED",
@@ -111,144 +111,144 @@
             "seq": 18,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.772Z",
+            "at": "2026-11-05T08:16:23.780Z",
             "kind": "CREATE",
             "step": "create",
             "op_id": "S4:create",
             "from_status": null,
             "to_status": "PENDING",
             "detail": "Tạo đơn O4 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S4 trong 1 transaction",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 19,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.777Z",
+            "at": "2026-11-05T08:16:23.786Z",
             "kind": "INTENT",
             "step": "reserve",
             "op_id": "S4:reserve",
             "from_status": "PENDING",
             "to_status": "PENDING",
             "detail": "Ghi intent \"reserve\" + op S4:reserve vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 20,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.783Z",
+            "at": "2026-11-05T08:16:23.794Z",
             "kind": "OUTCOME",
             "step": "reserve",
             "op_id": "S4:reserve",
             "from_status": "PENDING",
             "to_status": "RESERVED",
             "detail": "Kho giữ hàng R3 (còn 8)",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 21,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.785Z",
+            "at": "2026-11-05T08:16:23.796Z",
             "kind": "INTENT",
             "step": "charge",
             "op_id": "S4:charge",
             "from_status": "RESERVED",
             "to_status": "RESERVED",
             "detail": "Ghi intent \"charge\" + op S4:charge vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 22,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.793Z",
+            "at": "2026-11-05T08:16:23.804Z",
             "kind": "OUTCOME",
             "step": "charge",
             "op_id": "S4:charge",
             "from_status": "RESERVED",
             "to_status": "CHARGED",
             "detail": "Ví đã trừ 350.000đ (charge C3) → tiếp tục xác nhận",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 23,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.795Z",
+            "at": "2026-11-05T08:16:23.806Z",
             "kind": "OUTCOME",
             "step": "confirm",
             "op_id": "S4:confirm",
             "from_status": "CHARGED",
             "to_status": "COMPENSATING",
             "detail": "Xác nhận đơn bị từ chối TRƯỚC khi commit CONFIRMED → bù: hoàn tiền rồi nhả hàng",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 24,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.797Z",
+            "at": "2026-11-05T08:16:23.809Z",
             "kind": "INTENT",
             "step": "refund",
             "op_id": "S4:refund",
             "from_status": "COMPENSATING",
             "to_status": "COMPENSATING",
             "detail": "Ghi intent \"refund\" + op S4:refund vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 25,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.804Z",
+            "at": "2026-11-05T08:16:23.819Z",
             "kind": "OUTCOME",
             "step": "refund",
             "op_id": "S4:refund",
             "from_status": "COMPENSATING",
             "to_status": "COMPENSATING",
             "detail": "Hoàn 350.000đ về ví (refund RF1 → C3); dòng charge vẫn giữ trong ledger",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 26,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.806Z",
+            "at": "2026-11-05T08:16:23.822Z",
             "kind": "INTENT",
             "step": "release",
             "op_id": "S4:release",
             "from_status": "COMPENSATING",
             "to_status": "COMPENSATING",
             "detail": "Ghi intent \"release\" + op S4:release vào Order DB trước khi gọi",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 27,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.812Z",
+            "at": "2026-11-05T08:16:23.829Z",
             "kind": "OUTCOME",
             "step": "release",
             "op_id": "S4:release",
             "from_status": "COMPENSATING",
             "to_status": "COMPENSATING",
             "detail": "Nhả hàng R3 về kho (còn 9)",
-            "pid": 15456
+            "pid": 20796
           },
           {
             "seq": 28,
             "saga_id": "S4",
             "order_id": "O4",
-            "at": "2026-11-05T04:00:04.814Z",
+            "at": "2026-11-05T08:16:23.832Z",
             "kind": "OUTCOME",
             "step": "cancel",
             "op_id": "S4:cancel",
             "from_status": "COMPENSATING",
             "to_status": "CANCELLED",
             "detail": "Hủy đơn: CANCELLED (mọi tác động đã được bù xong)",
-            "pid": 15456
+            "pid": 20796
           }
         ]
       },
@@ -262,8 +262,8 @@
           "status": "RELEASED",
           "reserve_op_id": "S4:reserve",
           "release_op_id": "S4:release",
-          "created_at": "2026-11-05T04:00:04.777Z",
-          "released_at": "2026-11-05T04:00:04.806Z"
+          "created_at": "2026-11-05T08:16:23.790Z",
+          "released_at": "2026-11-05T08:16:23.826Z"
         }
       ],
       "ledger": [
@@ -279,7 +279,7 @@
           "reason": null,
           "balance_after": 1300000,
           "op_id": "S4:charge",
-          "at": "2026-11-05T04:00:04.787Z"
+          "at": "2026-11-05T08:16:23.800Z"
         },
         {
           "seq": 7,
@@ -293,7 +293,7 @@
           "reason": "Hoàn tiền (bù)",
           "balance_after": 1650000,
           "op_id": "S4:refund",
-          "at": "2026-11-05T04:00:04.798Z"
+          "at": "2026-11-05T08:16:23.815Z"
         }
       ],
       "label": "cuoi"
@@ -302,23 +302,23 @@
   "extra": {},
   "timeline": [
     {
-      "at": "2026-11-05T04:00:04.764Z",
+      "at": "2026-11-05T08:16:23.769Z",
       "event": "===== F3: Xác nhận đơn bị từ chối sau khi đã thu tiền ====="
     },
     {
-      "at": "2026-11-05T04:00:04.768Z",
+      "at": "2026-11-05T08:16:23.773Z",
       "event": "FAULT order: confirm=reject (1 lần) → HTTP 200"
     },
     {
-      "at": "2026-11-05T04:00:04.778Z",
+      "at": "2026-11-05T08:16:23.785Z",
       "event": "ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O4 / S4 (350000đ)"
     },
     {
-      "at": "2026-11-05T04:00:04.942Z",
-      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.936Z] Snapshot đơn O4\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R3 RELEASED\n  Payment DB  (api): C3 charge 350000 CHARGED op=S4:charge | RF1 refund 350000 REFUNDED →C3 op=S4:refund"
+      "at": "2026-11-05T08:16:23.964Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T08:16:23.955Z] Snapshot đơn O4\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R3 RELEASED\n  Payment DB  (api): C3 charge 350000 CHARGED op=S4:charge | RF1 refund 350000 REFUNDED →C3 op=S4:refund"
     },
     {
-      "at": "2026-11-05T04:00:04.942Z",
+      "at": "2026-11-05T08:16:23.965Z",
       "event": "ORACLE F3: ĐẠT 7/7"
     }
   ]

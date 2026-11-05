@@ -1,25 +1,25 @@
 # F4 — Payment chết sau khi đã thu, trước response
 Đơn O5, saga S5. Oracle: Khi Payment dừng: RECOVERING. Restore, query cùng op thấy CHARGED, confirm; cuối như H0.
 
-[2026-11-05T04:00:04.944Z] ===== F4: Payment chết sau khi đã thu, trước response =====
-[2026-11-05T04:00:04.948Z] FAULT payment: charge.afterCommit=freeze (1 lần) → HTTP 200
-[2026-11-05T04:00:04.959Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O5 / S5 (350000đ)
-[2026-11-05T04:00:05.016Z] MARKER payment.charge.committed (pid 25876, op S5:charge, C4)
-[2026-11-05T04:00:05.019Z] KILL payment pid=25876 (process thật bị dừng)
-[2026-11-05T04:00:05.192Z] SNAPSHOT khi-payment-dung
-[2026-11-05T04:00:05.175Z] Snapshot đơn O5
+[2026-11-05T08:16:23.967Z] ===== F4: Payment chết sau khi đã thu, trước response =====
+[2026-11-05T08:16:23.975Z] FAULT payment: charge.afterCommit=freeze (1 lần) → HTTP 200
+[2026-11-05T08:16:23.989Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O5 / S5 (350000đ)
+[2026-11-05T08:16:24.046Z] MARKER payment.charge.committed (pid 21248, op S5:charge, C4)
+[2026-11-05T08:16:24.049Z] KILL payment pid=21248 (process thật bị dừng)
+[2026-11-05T08:16:24.232Z] SNAPSHOT khi-payment-dung
+[2026-11-05T08:16:24.220Z] Snapshot đơn O5
   Order DB    (api): RECOVERING  phase=charge  intent=charge S5:charge  pending=[]
   Inventory DB(api): R4 ACTIVE
   Payment DB  (db-file (Payment không truy cập được: ECONNREFUSED)): C4 charge 350000 CHARGED op=S5:charge
-[2026-11-05T04:00:08.208Z] Sau 3 giây Payment vẫn chết: đơn O5 = RECOVERING (không terminal giả)
-[2026-11-05T04:00:08.562Z] START payment pid=27096 (process mới, cùng file DB)
-[2026-11-05T04:00:08.887Z] Hội tụ sau 679ms kể từ khi start Payment
-[2026-11-05T04:00:08.896Z] SNAPSHOT cuoi
-[2026-11-05T04:00:08.888Z] Snapshot đơn O5
+[2026-11-05T08:16:27.249Z] Sau 3 giây Payment vẫn chết: đơn O5 = RECOVERING (không terminal giả)
+[2026-11-05T08:16:27.600Z] START payment pid=25664 (process mới, cùng file DB)
+[2026-11-05T08:16:31.191Z] Hội tụ sau 3942ms kể từ khi start Payment
+[2026-11-05T08:16:31.203Z] SNAPSHOT cuoi
+[2026-11-05T08:16:31.191Z] Snapshot đơn O5
   Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
   Inventory DB(api): R4 ACTIVE
   Payment DB  (api): C4 charge 350000 CHARGED op=S5:charge
-[2026-11-05T04:00:08.896Z] ORACLE F4: ĐẠT 8/8
+[2026-11-05T08:16:31.203Z] ORACLE F4: ĐẠT 8/8
 
 Kiểm tra oracle:
   ✓ Order CONFIRMED (CONFIRMED)

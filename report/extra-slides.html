@@ -1,0 +1,382 @@
+<!-- Slide bổ sung cho REPORT.html: các lựa chọn của nhóm (chọn gì, không chọn gì, vì sao, đánh đổi).
+     Mỗi <section> là một slide; <aside class="notes"> là phần giải thích hiện ở chế độ "Đọc tài liệu".
+     Build: npm run report  (ghép với presentation/slides.html → REPORT.html) -->
+
+<section class="slide cover" data-title="Các lựa chọn của nhóm">
+  <div class="kick">Phần bổ sung của báo cáo</div>
+  <h1>Các lựa chọn của nhóm<br>chọn gì · không chọn gì · vì sao · đánh đổi</h1>
+  <p class="sub">Mỗi slide tiếp theo là một quyết định dẫn tới kết quả cuối cùng. Chi tiết đầy đủ trong REPORT.md mục 4.</p>
+  <div class="chips"><span class="chip">Node.js + Express</span><span class="chip">Saga orchestration</span><span class="chip">SQLite mỗi service</span><span class="chip">Intent + op ID</span><span class="chip">Idempotency</span><span class="chip">State machine + guard</span><span class="chip">Unknown outcome</span><span class="chip">Compensation</span><span class="chip">Fault + kill thật</span><span class="chip">Web UI</span><span class="chip">OpenAPI + Swagger</span><span class="chip">Logging + evidence</span><span class="chip">Jest trên process thật</span><span class="chip">Seed + triển khai</span></div>
+  <aside class="notes">Phần này bổ sung vào bộ slide thuyết trình theo yêu cầu nộp REPORT.html: giải thích các lựa chọn của nhóm cho kết quả cuối cùng. Mỗi slide theo cùng một khung: cột xanh là lý do chọn, cột đỏ là các phương án đã cân nhắc nhưng không chọn kèm lý do, cột vàng là đánh đổi nhóm chấp nhận và bằng chứng.</aside>
+</section>
+
+<section class="slide" data-title="Kết quả cuối cùng">
+  <div class="kick">Báo cáo · Kết quả</div>
+  <h2>Kết quả cuối cùng so với baseline</h2>
+  <p class="sub">Mọi số liệu lấy từ lượt chạy thật: <span class="mono">evidence/test-output.txt</span>, <span class="mono">evidence/SUMMARY.md</span></p>
+  <table>
+    <tr><th>Đại lượng</th><th>Baseline (gọi tuần tự)</th><th>Bản nộp</th></tr>
+    <tr><td>Confirm lỗi sau khi đã thu tiền</td><td><span class="tag bad">khách mất 350.000đ, hàng bị giữ</span></td><td><span class="tag ok">refund 1 lần, hàng về kho, tiền còn</span></td></tr>
+    <tr><td>Kịch bản H0, F1–F6 đạt oracle</td><td>—</td><td><b>7/7</b> · 48/48 check</td></tr>
+    <tr><td>Automated test</td><td>—</td><td><b>30/30</b> (unit + tích hợp trên 3 process thật)</td></tr>
+    <tr><td>Kill Payment sau commit (F4)</td><td>caller timeout, không biết đã thu chưa</td><td>RECOVERING → CONFIRMED sau 0,7–4 s, <b>1 charge</b></td></tr>
+    <tr><td>Refund lỗi tạm (F5)</td><td>—</td><td>COMPENSATING + pending bền → CANCELLED sau 1,3 s</td></tr>
+    <tr><td>Kill orchestrator tại khoảng hở (F6)</td><td>mất trạng thái trong RAM</td><td>restart cùng DB, cùng op ID, CONFIRMED sau 0,5 s</td></tr>
+    <tr><td>Double charge / refund · terminal giả</td><td>—</td><td><b>0</b> · <b>0</b></td></tr>
+    <tr><td>Route có trong tài liệu OpenAPI</td><td>—</td><td><b>26/26</b>, có test khóa</td></tr>
+  </table>
+  <aside class="notes">Bảng này trả lời câu hỏi "nhóm đạt được gì". Cột baseline là kết quả của npm run baseline: checkout gọi tuần tự reserve, charge, confirm mà không có Saga. Cột bản nộp lấy từ npm run evidence và npm run test:report. Thời gian hội tụ của F4 dao động vì phụ thuộc vào nấc backoff đang chờ (1, 2, 4 hoặc 5 giây) khi Payment được bật lại.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: ngôn ngữ">
+  <div class="kick">Lựa chọn 1 · Ngôn ngữ, runtime, framework</div>
+  <h2>Node.js 22 + Express 5 (JavaScript CommonJS)</h2>
+  <p class="sub">Đồng nhất với Block 5–6, khởi động nhanh, có sẵn công cụ cho timeout và "đóng băng" process</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Nhóm đã dùng ở Block 5–6: tái dùng cấu trúc và Jest</li>
+      <li><span class="mono">fetch</span> + <span class="mono">AbortSignal.timeout</span> có sẵn: mọi lời gọi có timeout, không cần thư viện</li>
+      <li>Process khởi động khoảng 0,3 s: demo kill/start mượt</li>
+      <li>Đơn luồng: <span class="mono">Atomics.wait</span> đóng băng đúng cả process (F4, F6)</li>
+      <li>Express 5 chuyển lỗi handler async về một error middleware</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Spring Boot</b>: mỗi service một JVM, khởi động vài giây; annotation che cơ chế cần trình bày</li>
+      <li><b>NestJS</b>: decorator + DI + build TS cho khoảng 1.100 dòng logic</li>
+      <li><b>TypeScript</b>: thêm bước build trước mỗi lần start process</li>
+      <li><b>Go / FastAPI</b>: khác hệ sinh thái, không có lợi thế riêng</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Không có kiểm kiểu tĩnh. Bù bằng state machine là hàm thuần có 16 unit test và test tích hợp trên process thật.</p></div>
+  </div>
+  <aside class="notes">Tiêu chí chính là: thấy rõ cơ chế và demo kill/start nhanh. Node khởi động gần như tức thì nên khi kill rồi start Payment hay Order, thời gian hội tụ đo được phản ánh đúng logic phục hồi chứ không bị thời gian khởi động JVM che. Atomics.wait chặn event loop, nên process bị "đóng băng" thật: không trả lời cả request query. Đó là điều kiện để Order thật sự không biết kết quả charge.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: Saga orchestration">
+  <div class="kick">Lựa chọn 2 · Giao thức và kiểu điều phối</div>
+  <h2>Saga orchestration, orchestrator đặt trong Order</h2>
+  <p class="sub">Không tìm một commit chung; mỗi bước commit riêng, lỗi thì bù. Một nơi quyết định và ghi Saga record.</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Ví/cổng thanh toán không có pha <b>prepare</b>: 2PC không áp dụng được</li>
+      <li>Saga record cùng DB với đơn: đổi trạng thái đơn và saga trong <b>1 local transaction</b></li>
+      <li>Đọc bảng <span class="mono">sagas</span> là biết đơn ở đâu, còn nợ gì</li>
+      <li>Test chỉ cần chờ trạng thái terminal rồi assert 3 kho</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>2PC / XA</b>: in-doubt, giữ khóa và blocking khi mất coordinator</li>
+      <li><b>3PC</b>: sai khi mạng bị chia cắt; thêm một vòng mạng</li>
+      <li><b>Choreography</b>: cần broker, flow rải rác ba nơi</li>
+      <li><b>Temporal / Camunda / Step Functions</b>: làm sẵn đúng phần bài cần tự hiểu, hạ tầng nặng</li>
+      <li><b>Orchestrator là process thứ 4</b>: saga và đơn nằm ở hai DB, không còn chung một transaction</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Mất isolation, nhất quán theo thời gian; phải thiết kế bù cho từng bước; Order vừa là service vừa là orchestrator, chỉ một instance.</p></div>
+  </div>
+  <aside class="notes">Slide 14 của thầy chỉ ra checkout không dùng được 2PC vì Payment không có prepare. Nhóm chọn orchestration thay vì choreography vì lab chưa có broker, và vì cần quan sát rõ từng nhánh lỗi F3, F5. Đặt orchestrator ngay trong Order giúp hàm persist() ghi trạng thái đơn, Saga record và một dòng saga_steps trong cùng một transaction SQLite, nên không bao giờ có cảnh đơn ở trạng thái này mà saga ở trạng thái khác.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: database">
+  <div class="kick">Lựa chọn 3 · Cơ sở dữ liệu</div>
+  <h2>SQLite, mỗi service một file · WAL + synchronous=FULL</h2>
+  <p class="sub"><span class="mono">data/order.db</span> · <span class="mono">data/inventory.db</span> · <span class="mono">data/payment.db</span>, qua better-sqlite3</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Ba file là <b>ba DB độc lập thật</b></li>
+      <li>Commit là đã fsync: kill process không mất dữ liệu đã commit</li>
+      <li>"Restart cùng DB" = chạy lại process (F6)</li>
+      <li>Không cần Docker; máy chấm chỉ cần <span class="mono">npm ci</span></li>
+      <li><span class="mono">db.transaction()</span> tự ROLLBACK khi lỗi</li>
+      <li>Snapshot đọc file read-only khi service đang chết</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>PostgreSQL/MySQL + Docker</b>: thêm container, pool, khởi động chậm; không giúp phần được chấm</li>
+      <li><b>node:sqlite</b>: experimental, in cảnh báo, không có <span class="mono">transaction()</span> (giữ làm dự phòng)</li>
+      <li><b>In-memory</b>: kill là mất dữ liệu, không làm được F4/F6</li>
+      <li><b>MongoDB</b>: cần UNIQUE/CHECK cho ledger và operation</li>
+      <li><b>synchronous=OFF/NORMAL</b>: có thể mất commit gần nhất</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Không chứng minh tải hay nhiều writer (phạm vi Block 6). Đổi sang PostgreSQL chỉ cần thay <span class="mono">common/db.js</span> và schema.</p></div>
+  </div>
+  <aside class="notes">Bài cần ba database thật sự tách rời, cần dữ liệu đã commit còn nguyên sau khi kill process, và cần chạy lại trên đúng file cũ. SQLite mỗi service một file đáp ứng cả ba mà không cần hạ tầng. Mỗi DB chỉ có đúng một process ghi nên giới hạn một writer của SQLite không ảnh hưởng. synchronous=FULL bảo đảm khi Payment trả lời đã commit thì dữ liệu đã nằm trên đĩa. Ở F4, snapshot lúc Payment chết đọc thẳng file payment.db và thấy C4 CHARGED.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: intent + op ID">
+  <div class="kick">Lựa chọn 4 · Saga record và operation ID</div>
+  <h2>Ghi intent + op ID cố định trước khi gọi</h2>
+  <p class="sub">(1) INTENT ghi <span class="mono">{step, op_id}</span> → (2) CALL HTTP → (3) OUTCOME ghi kết quả. Op ID = <span class="mono">opId(saga, step)</span> → <span class="mono">S7:charge</span></p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Process chết chỉ còn DB; intent cho biết "đang charge với S7:charge"</li>
+      <li>Op ID suy từ saga: retry hay restart luôn ra <b>đúng ID cũ</b></li>
+      <li><span class="mono">nextAction()</span> chỉ đọc trạng thái đã lưu: chạy đầu và resume dùng chung code</li>
+      <li><span class="mono">saga_steps</span> (seq, op, pid) vừa là nhật ký UI vừa là trace</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Chỉ lưu status RESERVED</b>: restart không biết đã charge chưa → C2 hoặc hủy nhầm</li>
+      <li><b>UUID mới mỗi lần gọi</b>: nguyên nhân double charge</li>
+      <li><b>Giữ tiến trình trong RAM</b>: F6 mất việc dở dang</li>
+      <li><b>Event sourcing đầy đủ</b>: nặng so với nhu cầu</li>
+      <li><b>Header Idempotency-Key</b>: tương đương; giữ tên trường theo contract slide 27</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Thêm 1–2 lần ghi DB mỗi bước. Một saga cần charge nhiều lần thì phải thêm số thứ tự vào op ID. <b>Bằng chứng:</b> F6, Order DB lúc chết: <span class="mono">RESERVED, phase=charge, intent=charge S7:charge</span>.</p></div>
+  </div>
+  <aside class="notes">Slide 20 của thầy so sánh ba thiết kế ở ba điểm dừng quanh lời gọi charge: chỉ lưu status rồi retry với ID mới; chỉ lưu status rồi hủy khi thấy RESERVED; và lưu intent cùng C1 rồi replay C1. Chỉ thiết kế thứ ba đúng ở cả ba điểm dừng; nhóm hiện thực đúng thiết kế đó. Việc suy op ID từ saga_id loại bỏ khả năng sinh ID mới, kể cả khi code có bug.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: idempotency">
+  <div class="kick">Lựa chọn 5 · Idempotency ở Inventory và Payment</div>
+  <h2>Bảng operations cùng transaction + UNIQUE ở DB</h2>
+  <p class="sub"><span class="mono">operations(op_id PK, kind, request_hash, status, http_status, result_json)</span> ghi cùng local transaction với thay đổi nghiệp vụ</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Cùng op + cùng nội dung → trả kết quả cũ (<span class="mono">replayed: true</span>)</li>
+      <li>Cùng op + khác nội dung → <span class="mono">409 OP_PAYLOAD_MISMATCH</span></li>
+      <li>Cùng transaction: không có khoảng hở "đã trừ tiền mà chưa ghi op"</li>
+      <li>Chốt ở DB: <span class="mono">ledger.op_id UNIQUE</span>, <span class="mono">one_refund_per_charge</span></li>
+      <li><span class="mono">GET …/operations/:op</span> cho RECOVERING</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Cache Redis / Map trong RAM</b>: mất khi restart, không cùng transaction</li>
+      <li><b>Chỉ kiểm trong code</b>: request cũ và bản gửi lại tới cùng lúc có thể cùng lọt</li>
+      <li><b>Lặng lẽ trả kết quả cũ khi payload khác</b>: che bug của bên gọi</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Bảng operations lớn dần; thực tế cần dọn theo TTL sau khi saga terminal. <b>Bằng chứng:</b> 5 test idempotency; mọi kịch bản 0 double charge, 0 double refund.</p></div>
+  </div>
+  <aside class="notes">Saga chắc chắn sẽ gửi lại: sau timeout, khi resume, khi bước bù lỗi tạm. Vì vậy mọi bước tiến và bước bù phải idempotent. Nhóm dùng hai lớp: bảng operations trả lại kết quả cũ, và ràng buộc UNIQUE ở DB chặn bản ghi trùng ngay cả khi hai request chạy song song. Index one_refund_per_charge bảo đảm mỗi charge chỉ được refund một lần.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: state machine">
+  <div class="kick">Lựa chọn 6 · State machine</div>
+  <h2>Hàm thuần apply(saga, event) + GuardError</h2>
+  <p class="sub">Không DB, không mạng → unit test trực tiếp; guard chặn mọi chuyển trạng thái thiếu bằng chứng</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>16 unit test, chạy dưới 1 giây</li>
+      <li>Guard tập trung một chỗ, khớp từng snapshot sai trong slide 30</li>
+      <li>Orchestrator chỉ còn: đọc DB → <span class="mono">apply</span> → ghi DB</li>
+      <li>7 trạng thái đúng tên trong slide 24</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>XState</b>: thêm dependency và DSL cho 7 trạng thái</li>
+      <li><b>if/else rải trong orchestrator</b>: guard lẫn với I/O, không unit test được</li>
+      <li><b>Trigger/CHECK trong DB</b>: kiểm giá trị, không kiểm thứ tự chuyển</li></ul></div>
+    <div class="card warn"><h3>Guard → lỗi được chặn</h3><ul>
+      <li>Chưa giữ hàng thì không charge (F1)</li>
+      <li>Refund trước release</li>
+      <li>Cancel chỉ khi pending rỗng</li>
+      <li>RECOVERING không tới thẳng CANCELLED/CONFIRMED</li>
+      <li>Terminal không nhận sự kiện</li></ul></div>
+  </div>
+  <aside class="notes">Rubric yêu cầu "state machine có guard". Nhóm tách luật chuyển trạng thái ra một hàm thuần để có thể kiểm từng guard bằng unit test, không cần dựng service. Mỗi guard tương ứng với một snapshot "chưa đạt" trong slide chấm snapshot của thầy, ví dụ: Order CANCELLED nhưng charge chưa được refund, hoặc F4 báo CANCELLED trong lúc Payment còn chết.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: unknown outcome">
+  <div class="kick">Lựa chọn 7 · Kết quả chưa rõ, timeout, retry</div>
+  <h2>RECOVERING → query → gửi lại cùng op; timeout 2s, backoff 1/2/4/5s</h2>
+  <p class="sub">201 → CHARGED · 402 → bù · timeout/ECONNRESET/ECONNREFUSED/5xx → <b>chưa biết</b></p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>F4 chứng minh: caller thấy ECONNRESET nhưng C4 đã commit</li>
+      <li>NOT_FOUND chưa là kết luận (slide 22) → gửi lại cùng op, an toàn vì idempotent</li>
+      <li>Biết CHARGED → confirm (policy V2)</li>
+      <li>Timeout 2s: không treo theo process bị đóng băng</li>
+      <li>Backoff tối đa 5s: hội tụ ≤ 15s</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Timeout = thất bại → hủy</b>: tiền đã thu mà đơn hủy</li>
+      <li><b>Charge lại với ID mới</b>: thu hai lần</li>
+      <li><b>Refund mù khi chưa rõ</b>: refund charge có thể chưa tồn tại</li>
+      <li><b>Không timeout / retry liên tục</b>: treo hoặc dồn tải</li>
+      <li><b>Circuit breaker</b>: chưa cần ở quy mô lab</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Đơn có thể ở RECOVERING lâu khi Payment chết lâu; khách thấy "Đang xác minh thanh toán". Hội tụ F4 dao động 0,7–4 s tùy nấc backoff.</p></div>
+  </div>
+  <aside class="notes">Đây là quyết định quan trọng nhất của V2. Timeout có ba khả năng thực tế: request chưa tới Payment, Payment đang xử lý, hoặc Payment đã thu nhưng response bị mất (slide 21). Order không phân biệt được ba khả năng này nên không được kết luận. Nhóm giữ RECOVERING, hỏi operation, và chỉ chuyển trạng thái khi có kết quả dứt khoát. Mọi con số timeout và backoff nằm trong config.js.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: compensation">
+  <div class="kick">Lựa chọn 8 · Compensation</div>
+  <h2>refund → release → cancel; refund là dòng ledger mới; pending lưu bền</h2>
+  <p class="sub">Ledger chỉ INSERT. Bù lỗi tạm thời: giữ COMPENSATING, pending không đổi, thử lại có backoff.</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Giữ lịch sử charge: đối soát, khiếu nại được (slide 17)</li>
+      <li>Đúng quy định lab: refund trước, release sau</li>
+      <li><span class="mono">pending</span> bền: F5 + restart vẫn không quên việc</li>
+      <li>Khách thấy "mua thất bại nhưng tiền vẫn còn"</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Xóa/sửa dòng charge</b>: tiền vẫn mất, mất bằng chứng (snapshot 6)</li>
+      <li><b>Release trước refund</b>: hàng về kho khi tiền chưa hoàn</li>
+      <li><b>Bù song song</b>: thứ tự không xác định, khó chứng minh trace</li>
+      <li><b>Bỏ qua lỗi bù, đánh dấu CANCELLED</b>: terminal giả</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Khách thấy tiền bị trừ trong khoảng từ lúc charge tới lúc refund. Refund lỗi vĩnh viễn cần xử lý thủ công (ngoài phạm vi). <b>Bằng chứng:</b> F3 7/7, F5 8/8, <span class="mono">seq(refund) &lt; seq(release)</span>.</p></div>
+  </div>
+  <aside class="notes">Compensation không phải rollback: rollback hủy thay đổi chưa commit, còn compensation là một thao tác nghiệp vụ mới, đã commit. Ở tab Ví tiền, đơn F3 có dòng thu tiền C3 và dòng hoàn tiền RF1 trỏ về C3; số dư khách trở lại như cũ. Test F3 kiểm thứ tự bằng seq của saga_steps, vì timestamp có thể trùng nhau.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: tạo lỗi và process">
+  <div class="kick">Lựa chọn 9 · Tạo lỗi và quản lý process</div>
+  <h2>Fault hook + đóng băng + marker + kill process thật · scripts/lab.js</h2>
+  <p class="sub">F1, F2 là lỗi tự nhiên (hết hàng, ví thiếu tiền); F3–F6 dùng hook, chỉ bật khi <span class="mono">LAB_FAULTS=1</span></p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Đúng yêu cầu "script kill, start process thật", đúng vị trí</li>
+      <li>Process đóng băng không trả lời cả query → Order thật sự không biết</li>
+      <li>Marker (PID, op ID, timestamp) chính là evidence</li>
+      <li>Fault nằm trong RAM: restart là hết treo</li>
+      <li><span class="mono">lab.js</span>: kill từng process theo tên, có PID file, dùng chung với test</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>throw Error giả</b>: không chứng minh dữ liệu đã commit bền</li>
+      <li><b>process.exit trong hook</b>: không phải script kill, khó demo từng bước</li>
+      <li><b>Toxiproxy / Chaos Monkey</b>: không đặt được điểm "sau commit, trước response"</li>
+      <li><b>PM2</b>: tự restart, phá kịch bản</li>
+      <li><b>Docker Compose</b>: kill/start chậm, cần Docker Desktop</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Route <span class="mono">/__lab/*</span> phải tắt ở production (<span class="mono">LAB_FAULTS=0</span>); không có tự giám sát (cố ý, để demo).</p></div>
+  </div>
+  <aside class="notes">Với F4, Payment commit charge, ghi marker payment.charge.committed rồi đóng băng. Script chờ file marker xuất hiện rồi kill process thật, nên vị trí dừng là xác định. Với F6, Order nhận CHARGED rồi đóng băng trước khi ghi outcome. Sau khi start lại, PID khác với PID trong các bước trước, và bước RESUME trong Saga record ghi PID mới: đó là bằng chứng có hai process khác nhau.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: Web UI">
+  <div class="kick">Lựa chọn 10 · Web UI</div>
+  <h2>HTML/JS thuần, process riêng, polling 1s, bốn góc nhìn</h2>
+  <p class="sub">Theo góp ý của thầy: khách mua hàng, thủ kho, ví tiền, ma trận kịch bản. UI chỉ đọc API, không tự tính trạng thái.</p>
+  <div class="cols c46">
+    <div class="shotbox"><img class="shot" src="img/07-kho.jpg" alt="Tab Kho"><div class="cap">Tab Kho: tồn khả dụng, hàng đang giữ cho đơn, op giữ/nhả</div></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card ok"><h3>Vì sao chọn</h3><ul>
+        <li>Kill Order (F6) thì UI vẫn sống, báo đúng service chết</li>
+        <li>Gọi thẳng từng service (CORS cho :3000)</li>
+        <li>Không cần build; khoảng 500 dòng JS</li></ul></div>
+      <div class="card bad"><h3>Không chọn</h3><ul>
+        <li><b>React/Vue</b>: thêm build</li>
+        <li><b>SSE/WebSocket</b>: kết nối đứt khi kill, phải nối lại</li>
+        <li><b>Order phục vụ UI / gateway</b>: kill Order là mất UI, che ranh giới</li></ul></div>
+      <div class="card warn"><p><b>Đánh đổi:</b> khoảng 10–20 request/giây khi mở tab Ma trận, không đáng kể ở localhost.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Rubric chấm "UI đọc qua API, số liệu khớp DB, tự cập nhật khi trạng thái đổi" và bắt lỗi "UI tự tính trạng thái, dữ liệu cứng, hoặc đọc thẳng DB của service khác". Vì vậy mọi số liệu lấy từ API của đúng service sở hữu: trạng thái đơn từ Order, số dư từ Payment, tồn kho từ Inventory. Cột "tiền của khách" chỉ ghép các dòng ledger của đơn để hiển thị.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: tài liệu API">
+  <div class="kick">Lựa chọn 11 · Tài liệu API</div>
+  <h2>OpenAPI 3.1 viết tay + Swagger UI tại /docs, có test khớp route</h2>
+  <p class="sub"><span class="mono">docs/openapi.yaml</span> · mỗi path có <span class="mono">servers</span> đúng cổng service · "Try it out" gọi thẳng service thật</p>
+  <div class="cols c46">
+    <div class="shotbox"><img class="shot" src="img/13-swagger.jpg" alt="Swagger UI"><div class="cap">http://127.0.0.1:3000/docs: 26 operation, 5 nhóm (Order, Inventory, Payment, Chung, Lab)</div></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card ok"><h3>Vì sao chọn</h3><ul>
+        <li>Chuẩn mở, đọc được trên GitHub và Swagger UI</li>
+        <li>Ghi rõ ngữ nghĩa SUCCEEDED/FAILED/NOT_FOUND và bảng fault hook</li>
+        <li>Test <span class="mono">openapi.test.js</span>: route trong code = route trong tài liệu</li></ul></div>
+      <div class="card bad"><h3>Không chọn</h3><ul>
+        <li><b>swagger-jsdoc</b>: YAML trong comment làm route khó đọc</li>
+        <li><b>Postman collection</b>: không phải chuẩn mở, khó kiểm bằng test</li>
+        <li><b>Redoc</b>: không có "Try it out"</li>
+        <li><b>Chỉ README</b>: không thử được request</li></ul></div>
+      <div class="card warn"><p><b>Đánh đổi:</b> schema chi tiết phải tự rà; test chỉ khóa method + path.</p></div>
+    </div>
+  </div>
+  <aside class="notes">Swagger UI chạy trong process UI ở cổng 3000; mỗi path khai servers trỏ đúng service sở hữu nên khi thử request, trình duyệt gọi thẳng 3001, 3002 hoặc 3003. Test openapi.test.js quét route trong mã nguồn của ba service và phần chung, rồi so với các path trong đặc tả; thêm route mà quên tài liệu là test đỏ.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: logging và evidence">
+  <div class="kick">Lựa chọn 12 · Logging, trace, evidence</div>
+  <h2>JSON Lines + marker + saga_steps + snapshot ba kho</h2>
+  <p class="sub">Đề chấm: "trace F4–F6: marker, operation ID trước và sau restart, lệnh phục hồi, timestamp"</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Mỗi service ghi JSON Lines ra <span class="mono">logs/&lt;svc&gt;.log</span></li>
+      <li>Marker có PID, op ID, timestamp</li>
+      <li><span class="mono">saga_steps</span> cùng transaction với trạng thái: không lệch</li>
+      <li>Snapshot ghi rõ nguồn <span class="mono">api</span> hay <span class="mono">db-file</span></li>
+      <li>Nối log ba service bằng <span class="mono">saga_id</span> + <span class="mono">op_id</span></li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>ELK / Loki trong lab</b>: nặng, không thêm giá trị cho bài Saga</li>
+      <li><b>OpenTelemetry + Jaeger</b>: cần collector; op ID đã đủ để nối</li>
+      <li><b>winston / pino</b>: thêm dependency cho vài loại sự kiện</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Chưa có correlation id chuẩn W3C. JSON Lines đã sẵn định dạng để đẩy vào ELK/Loki về sau mà không đổi code.</p></div>
+  </div>
+  <aside class="notes">Mỗi kịch bản trong npm run evidence ghi evidence/ID/timeline.txt gồm lệnh fault, marker, lệnh kill/start với PID cũ và mới, snapshot ba kho và kết quả oracle. Ví dụ F6: marker order.charge.afterCall pid 9144 op S7:charge, KILL order pid 9144, snapshot đọc file order.db thấy intent charge S7:charge, START order pid 15456, rồi CONFIRMED với cùng op S7:charge.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: kiểm thử">
+  <div class="kick">Lựa chọn 13 · Kiểm thử</div>
+  <h2>Jest gọi HTTP tới process thật · kịch bản và oracle dùng chung</h2>
+  <p class="sub">Test dựng 3 process trên cổng 4001–4003 với thư mục dữ liệu tạm; F4/F6 kill process thật ngay trong test</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li>Chứng minh ranh giới 3 process / 3 DB</li>
+      <li>Assert cả 3 kho và <b>toàn bộ ledger</b>, không chỉ exception</li>
+      <li><span class="mono">scenarios.js</span> + <span class="mono">oracle.js</span> dùng chung cho test, demo, UI: một định nghĩa duy nhất</li>
+      <li>Không đụng dữ liệu đang demo (cổng 300x)</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Supertest in-process</b>: không chứng minh 3 process, không kill được</li>
+      <li><b>Postman / Newman</b>: khó tạo lỗi đúng vị trí</li>
+      <li><b>node:test / Vitest</b>: Jest đã dùng ở block trước, có globalSetup</li>
+      <li><b>k6</b>: tải ngoài phạm vi</li></ul></div>
+    <div class="card warn"><h3>Kết quả</h3><p><b>30/30</b>: 16 state machine · 2 OpenAPI · 5 idempotency · 4 H0+F1–F3 · 3 F4–F6. Khoảng 15 giây.</p></div>
+  </div>
+  <aside class="notes">Yêu cầu V1 là ba automated failure test F1, F2, F3 phải assert trạng thái ở Order, Inventory và Payment, không chỉ assert exception. Mỗi test reset fixture, chờ trạng thái terminal tối đa 15 giây rồi kiểm từng kho. Test F3 kiểm thêm: dòng charge vẫn còn, có đúng một refund trỏ về charge, và refund đứng trước release theo seq. Nhóm tự động hóa thêm F4–F6, có kill process thật.</aside>
+</section>
+
+<section class="slide choice" data-title="Lựa chọn: dữ liệu và triển khai">
+  <div class="kick">Lựa chọn 14 · Dữ liệu và triển khai</div>
+  <h2>Seed JSON trong data/seed · npm ci + npm run reset · nộp qua GitHub + ZIP</h2>
+  <p class="sub">Máy chấm chỉ cần Node.js 22. Hướng dẫn đầy đủ trong README.md.</p>
+  <div class="cols c3">
+    <div class="card ok"><h3>Vì sao chọn</h3><ul>
+      <li><span class="mono">data/seed/inventory.json</span>, <span class="mono">payment.json</span>: sửa dữ liệu không đụng code</li>
+      <li>Loa tồn 0, Bình 300k: F1, F2 xảy ra tự nhiên</li>
+      <li><span class="mono">npm run reset</span>: trạng thái xác định trước mỗi demo</li>
+      <li><span class="mono">git archive</span> tạo ZIP chỉ gồm file được theo dõi</li></ul></div>
+    <div class="card bad"><h3>Không chọn</h3><ul>
+      <li><b>Seed viết cứng trong code</b> (bản đầu): khó xem, khó sửa</li>
+      <li><b>Nộp file .db</b>: nhị phân, phụ thuộc lúc chụp</li>
+      <li><b>Docker image</b>: xem lựa chọn 9 (kill/start chậm, cần Docker Desktop)</li></ul></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p>Cần native module <span class="mono">better-sqlite3</span> (có bản build sẵn cho Node 22 trên Windows, Linux, macOS).</p></div>
+  </div>
+  <aside class="notes">Yêu cầu nộp gồm mã nguồn, data và README hướng dẫn triển khai. Dữ liệu ban đầu được tách thành file JSON để dễ đọc và nộp kèm; các file DB lúc chạy (data/*.db) được tạo lại từ seed và không nộp. Lệnh reset chỉ xóa file .db, giữ seed.</aside>
+</section>
+
+<section class="slide" data-title="Tóm tắt lựa chọn">
+  <div class="kick">Báo cáo · Tóm tắt</div>
+  <h2>Bảng tóm tắt các lựa chọn</h2>
+  <table style="font-size:13px">
+    <tr><th>Hạng mục</th><th>Lựa chọn</th><th>Đã loại</th><th>Bằng chứng</th></tr>
+    <tr><td>Ngôn ngữ</td><td>Node 22 + Express 5</td><td>Spring Boot, NestJS, TS, Go</td><td><span class="mono">npm start</span></td></tr>
+    <tr><td>Giao thức / điều phối</td><td>Saga orchestration trong Order</td><td>2PC/XA, 3PC, choreography, Temporal</td><td>baseline, F3</td></tr>
+    <tr><td>Database</td><td>SQLite mỗi service · WAL + FULL</td><td>Postgres Docker, node:sqlite, in-memory</td><td>snapshot db-file F4/F6</td></tr>
+    <tr><td>Saga record / op ID</td><td>intent → call → outcome · <span class="mono">S7:charge</span></td><td>chỉ status, UUID mỗi lần, RAM</td><td>F6 9/9</td></tr>
+    <tr><td>Idempotency</td><td>operations cùng tx + UNIQUE</td><td>Redis/RAM, kiểm trong code</td><td>5 test</td></tr>
+    <tr><td>State machine</td><td>hàm thuần + GuardError</td><td>XState, if/else, trigger</td><td>16 test</td></tr>
+    <tr><td>Unknown outcome</td><td>RECOVERING → query → gửi lại cùng op</td><td>timeout = thất bại, ID mới, refund mù</td><td>F4 8/8</td></tr>
+    <tr><td>Compensation</td><td>refund → release → cancel, dòng mới</td><td>xóa charge, release trước, song song</td><td>F3 7/7, F5 8/8</td></tr>
+    <tr><td>Timeout / retry</td><td>2s · backoff 1/2/4/5s</td><td>không timeout, retry liên tục</td><td>hội tụ ≤ 4s</td></tr>
+    <tr><td>Tạo lỗi / process</td><td>hook + freeze + marker + kill · lab.js</td><td>throw giả, Toxiproxy, PM2, Compose</td><td>marker</td></tr>
+    <tr><td>UI</td><td>HTML/JS thuần, process riêng, 4 tab</td><td>React/Vue, SSE/WS, Order phục vụ UI</td><td>ảnh UI</td></tr>
+    <tr><td>Tài liệu API</td><td>OpenAPI 3.1 + Swagger UI + test</td><td>swagger-jsdoc, Postman, Redoc</td><td>26/26 route</td></tr>
+    <tr><td>Logging</td><td>JSON Lines + saga_steps + snapshot</td><td>ELK/Loki, OpenTelemetry, pino</td><td>timeline.txt</td></tr>
+    <tr><td>Kiểm thử</td><td>Jest + process thật</td><td>Supertest in-process, Postman</td><td>30/30</td></tr>
+    <tr><td>Dữ liệu / triển khai</td><td>data/seed JSON, npm ci + reset</td><td>seed cứng, nộp .db, Docker</td><td>README</td></tr>
+  </table>
+  <aside class="notes">Bảng gom mười lăm hạng mục quyết định. Cột cuối chỉ nơi kiểm chứng: số test, kết quả oracle trong evidence/SUMMARY.md, hoặc lệnh chạy được. Giải thích đầy đủ từng dòng nằm trong REPORT.md mục 4 và mục 5.</aside>
+</section>
+
+<section class="slide" data-title="Giới hạn">
+  <div class="kick">Báo cáo · Giới hạn</div>
+  <h2>Giới hạn và hướng phát triển</h2>
+  <table>
+    <tr><th>Giới hạn</th><th>Ảnh hưởng</th><th>Hướng xử lý</th></tr>
+    <tr><td>Một orchestrator</td><td>Không chạy nhiều instance Order</td><td>Claim saga bằng lease + fencing token</td></tr>
+    <tr><td>Chưa có broker/outbox</td><td>Không đảm bảo message/external effect đúng một lần</td><td>Transactional outbox + consumer idempotent (block sau)</td></tr>
+    <tr><td>Mất isolation</td><td>Người khác thấy hàng đang bị giữ</td><td>Semantic lock, đặt bước khó bù ở cuối</td></tr>
+    <tr><td>Refund lỗi vĩnh viễn</td><td>Saga kẹt ở COMPENSATING</td><td>Hàng chờ xử lý thủ công, cảnh báo</td></tr>
+    <tr><td>SQLite</td><td>Không chứng minh tải, nhiều writer</td><td>PostgreSQL, chỉ thay <span class="mono">common/db.js</span></td></tr>
+    <tr><td>Payment giả lập</td><td>PENDING gần như không xuất hiện</td><td>Cổng thanh toán bất đồng bộ + webhook</td></tr>
+    <tr><td>Không xác thực</td><td>Ai gọi được localhost cũng đặt hàng được</td><td>JWT/OAuth2 của Block 5–6</td></tr>
+    <tr><td>Bảng operations lớn dần</td><td>Tốn dung lượng</td><td>Dọn theo TTL sau khi saga kết thúc</td></tr>
+  </table>
+  <aside class="notes">Nhóm ghi rõ những gì chưa đảm bảo, để không gọi trạng thái còn pending là pass, và để chỉ ra phần nào thuộc block sau. Đặc biệt: Saga record bền giữ được ý định điều phối và đường phục hồi, nhưng không bảo đảm message đã được publish hay tác động bên ngoài xảy ra đúng một lần; outbox giải quyết khoảng hở giữa commit DB và publish message.</aside>
+</section>
+
+<section class="slide" data-title="Câu hỏi kết thúc">
+  <div class="kick">Báo cáo · Câu hỏi kết thúc</div>
+  <h2>Trả lời bảy câu hỏi kết thúc</h2>
+  <table style="font-size:13.5px">
+    <tr><th style="width:46%">Câu hỏi</th><th>Trả lời</th></tr>
+    <tr><td>1. Order rollback sau khi Payment đã commit charge: dòng nào trong ledger thay đổi?</td><td>Không dòng nào. Trả tiền phải gọi refund, tạo dòng mới trỏ về charge.</td></tr>
+    <tr><td>2. 2PC: participant prepared chưa nhận COMMIT có tự abort khi timeout được không?</td><td>Không. Có thể trái quyết định COMMIT; phải chờ recovery (blocking).</td></tr>
+    <tr><td>3. Pre-commit của 3PC có an toàn, non-blocking với mọi network partition?</td><td>Không. Dựa vào giả định thời gian và kiểu lỗi; timeout không chứng minh node kia đã dừng.</td></tr>
+    <tr><td>4. Timeout, query trả NOT_FOUND, contract không bảo đảm: trạng thái? ID mới?</td><td>RECOVERING; query hoặc gửi lại đúng op cũ; không cấp ID mới.</td></tr>
+    <tr><td>5. Refund đã commit, orchestrator chết trước khi ghi kết quả: tránh refund hai lần?</td><td>Đọc intent refund, gửi lại cùng refund op (Payment trả RF cũ, UNIQUE chặn), ghi kết quả rồi mới release, cancel.</td></tr>
+    <tr><td>6. F3: CANCELLED, released, charge chưa refund: đạt chưa?</td><td>Chưa. Phải giữ COMPENSATING tới khi refund xong; guard chặn cancel.</td></tr>
+    <tr><td>7. Record chỉ có RESERVED, thiếu phase và intent: đủ để charge lại?</td><td>Không. Cần intent bền, outcome và query provider.</td></tr>
+  </table>
+  <aside class="notes">Câu trả lời chi tiết kèm nơi hiện thực trong code nằm ở REPORT.md mục 11. Câu 4 và câu 5 tương ứng trực tiếp với hàm doRecover() và doRefund() trong orchestrator; câu 6 và câu 7 tương ứng với guard "cancel chỉ khi pending rỗng" và mẫu ghi intent trước khi gọi.</aside>
+</section>

@@ -22,7 +22,8 @@ module.exports = {
   HOST,
   PORTS,
   URLS: { order: url('order'), inventory: url('inventory'), payment: url('payment'), ui: url('ui') },
-  DATA_DIR: env.DATA_DIR || path.join(ROOT, 'data'),
+  DATA_DIR: env.DATA_DIR || path.join(ROOT, 'data'), // file DB lúc chạy: data/order.db, inventory.db, payment.db
+  SEED_DIR: env.SEED_DIR || path.join(ROOT, 'data', 'seed'), // dữ liệu ban đầu nộp kèm: data/seed/*.json
   RUN_DIR: env.RUN_DIR || path.join(ROOT, 'run'),
   LOG_DIR: env.LOG_DIR || path.join(ROOT, 'logs'),
   LAB_FAULTS: env.LAB_FAULTS !== '0', // hook tạo lỗi chỉ dùng trong lab; tắt bằng LAB_FAULTS=0

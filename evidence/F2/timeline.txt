@@ -1,14 +1,14 @@
 # F2 — Thanh toán thất bại (ví không đủ)
 Đơn O3, saga S3. Oracle: CANCELLED; reservation đã release có bằng chứng; không charge thành công, không refund.
 
-[2026-11-05T04:00:04.583Z] ===== F2: Thanh toán thất bại (ví không đủ) =====
-[2026-11-05T04:00:04.596Z] ĐẶT HÀNG CUS-BINH mua SKU-BANPHIM → O3 / S3 (900000đ)
-[2026-11-05T04:00:04.762Z] SNAPSHOT cuoi
-[2026-11-05T04:00:04.757Z] Snapshot đơn O3
+[2026-11-05T08:16:23.580Z] ===== F2: Thanh toán thất bại (ví không đủ) =====
+[2026-11-05T08:16:23.590Z] ĐẶT HÀNG CUS-BINH mua SKU-BANPHIM → O3 / S3 (900000đ)
+[2026-11-05T08:16:23.767Z] SNAPSHOT cuoi
+[2026-11-05T08:16:23.760Z] Snapshot đơn O3
   Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
   Inventory DB(api): R2 RELEASED
   Payment DB  (api): C2 charge 900000 FAILED op=S3:charge
-[2026-11-05T04:00:04.763Z] ORACLE F2: ĐẠT 5/5
+[2026-11-05T08:16:23.768Z] ORACLE F2: ĐẠT 5/5
 
 Kiểm tra oracle:
   ✓ Order CANCELLED (CANCELLED)

@@ -2,7 +2,8 @@
 // INVENTORY SERVICE — process riêng, DB riêng (data/inventory.db).
 // Sở hữu: sản phẩm + tồn kho, reservation (giữ hàng theo đơn), lịch sử vào/ra kho.
 const path = require('node:path');
-const { PORTS, HOST, DATA_DIR } = require('../../config');
+const fs = require('node:fs');
+const { PORTS, HOST, DATA_DIR, SEED_DIR } = require('../../config');
 const { openDb, tx, now } = require('../../common/db');
 const { makeLogger } = require('../../common/log');
 const { createFaults } = require('../../common/faults');
@@ -41,12 +42,8 @@ CREATE TABLE IF NOT EXISTS movements (
 );
 ${OPS_SCHEMA}`;
 
-const SEED_ITEMS = [
-  ['SKU-TAINGHE', 'Tai nghe Bluetooth', 350000, 10],
-  ['SKU-BANPHIM', 'Bàn phím cơ', 900000, 5],
-  ['SKU-CHUOT', 'Chuột không dây', 200000, 3],
-  ['SKU-LOA', 'Loa mini', 500000, 0], // hết hàng sẵn => F1 tự nhiên
-];
+// Dữ liệu ban đầu đọc từ data/seed/inventory.json (Loa mini tồn 0 => F1 tự nhiên)
+const SEED_ITEMS = JSON.parse(fs.readFileSync(path.join(SEED_DIR, 'inventory.json'), 'utf8')).items.map((i) => [i.sku, i.name, i.price, i.available]);
 
 const log = makeLogger('inventory');
 const faults = createFaults();
