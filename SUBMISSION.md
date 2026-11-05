@@ -2,11 +2,12 @@
 
 - **Tên gói:** `7-Block7-23127045-23127102-23127159-23127183-23127393.zip`
 - **Nhóm 07:** 23127045 · 23127102 · 23127159 · 23127183 · 23127393
-- **Repository:** https://github.com/DuyPham111/block7-checkout-saga (nhánh `main`)
+- **Repository:** https://github.com/DuyPham111/block7-checkout-saga. Mã nguồn nộp là tag `submit`, trùng với nội dung gói ZIP.
 - **Nội dung:** mã nguồn, dữ liệu ban đầu (`data/seed/`), README.md, REPORT.md, REPORT.html, AUDIT.md, tài liệu (`docs/`), slide (`presentation/`), evidence (`evidence/`).
 - **Không kèm:** `node_modules`, file DB lúc chạy (`data/*.db`), `run/`, `logs/`, `.git`. Cài lại thư viện bằng `npm ci`; DB tự tạo từ seed khi chạy `npm run reset`.
 - **Evidence** trong `evidence/` là output của lượt chạy thật ngày 05/11/2026 (Windows 11, Node 22.16.0). Không sửa tay số liệu. Tái tạo bằng `npm run test:report`, `npm run evidence`, `npm run baseline`.
 - **Video demo H0, F1–F6 trên UI:** sáu video trên YouTube (bảng bên dưới), quay theo [docs/KICH-BAN-VIDEO.md](docs/KICH-BAN-VIDEO.md). Ảnh UI lúc pending và lúc kết thúc chụp trong lúc quay: [evidence/video-screens/](evidence/video-screens/).
+- **`CHECKSUMS.sha256`** liệt kê SHA-256 của mọi file trong gói. Kiểm tra bằng `sha256sum -c CHECKSUMS.sha256` (Git Bash, Linux, macOS).
 - **Tạo gói** từ repository (chỉ gồm file được git theo dõi):
 
   ```bash
