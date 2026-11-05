@@ -1,0 +1,445 @@
+{
+  "id": "F4",
+  "order_id": "O5",
+  "saga_id": "S5",
+  "check": {
+    "id": "F4",
+    "ok": true,
+    "checks": [
+      {
+        "label": "Order CONFIRMED",
+        "ok": true,
+        "actual": "CONFIRMED"
+      },
+      {
+        "label": "Không còn pending",
+        "ok": true,
+        "actual": "-"
+      },
+      {
+        "label": "Đúng 1 reservation ACTIVE",
+        "ok": true,
+        "actual": "1/1"
+      },
+      {
+        "label": "Đúng 1 charge CHARGED",
+        "ok": true,
+        "actual": 1
+      },
+      {
+        "label": "Không refund",
+        "ok": true,
+        "actual": 0
+      },
+      {
+        "label": "Khách trả đúng tiền đơn",
+        "ok": true,
+        "actual": 350000
+      },
+      {
+        "label": "Đã qua RECOVERING (không terminal giả)",
+        "ok": true,
+        "actual": "có"
+      },
+      {
+        "label": "Chỉ 1 charge op ID (không charge mới)",
+        "ok": true,
+        "actual": "S5:charge"
+      }
+    ],
+    "summary": {
+      "status": "CONFIRMED",
+      "pending": [],
+      "resActive": 1,
+      "resReleased": 0,
+      "resTotal": 1,
+      "charged": 1,
+      "chargeFailed": 0,
+      "refunds": 0,
+      "refundLinked": false,
+      "chargeOps": [
+        "S5:charge"
+      ],
+      "sagaId": "S5",
+      "net": 350000,
+      "amount": 350000,
+      "seqRefund": null,
+      "seqRelease": null,
+      "calledCharge": true,
+      "wentRecovering": true,
+      "refundTempFail": false,
+      "resumed": false,
+      "pids": [
+        15456
+      ]
+    }
+  },
+  "snaps": [
+    {
+      "at": "2026-11-05T04:00:05.175Z",
+      "order_id": "O5",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "db-file (Payment không truy cập được: ECONNREFUSED)"
+      },
+      "order": {
+        "order_id": "O5",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-TAINGHE",
+        "item_name": "Tai nghe Bluetooth",
+        "quantity": 1,
+        "unit_price": 350000,
+        "amount": 350000,
+        "status": "RECOVERING",
+        "terminal": false,
+        "reason": null,
+        "scenario": "F4",
+        "created_at": "2026-11-05T04:00:04.952Z",
+        "updated_at": "2026-11-05T04:00:05.025Z",
+        "saga": {
+          "saga_id": "S5",
+          "status": "RECOVERING",
+          "phase": "charge",
+          "intent": {
+            "step": "charge",
+            "op_id": "S5:charge"
+          },
+          "pending": [],
+          "reservation_id": "R4",
+          "charge_id": null,
+          "failed_charge_id": null,
+          "refund_id": null,
+          "last_error": null,
+          "attempts": 1,
+          "next_attempt_at": "2026-11-05T04:00:06.025Z"
+        },
+        "steps": [
+          {
+            "seq": 29,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.952Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S5:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O5 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S5 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 30,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.958Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S5:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S5:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 31,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.966Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S5:reserve",
+            "from_status": "PENDING",
+            "to_status": "RESERVED",
+            "detail": "Kho giữ hàng R4 (còn 8)",
+            "pid": 15456
+          },
+          {
+            "seq": 32,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.968Z",
+            "kind": "INTENT",
+            "step": "charge",
+            "op_id": "S5:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Ghi intent \"charge\" + op S5:charge vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 33,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:05.025Z",
+            "kind": "UNKNOWN",
+            "step": "charge",
+            "op_id": "S5:charge",
+            "from_status": "RESERVED",
+            "to_status": "RECOVERING",
+            "detail": "Chưa rõ kết quả charge (ECONNRESET) → RECOVERING, KHÔNG coi là thất bại, KHÔNG charge ID mới — thử lại sau 1s (lần 1)",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [
+        {
+          "seq": 4,
+          "reservation_id": "R4",
+          "order_id": "O5",
+          "sku": "SKU-TAINGHE",
+          "quantity": 1,
+          "status": "ACTIVE",
+          "reserve_op_id": "S5:reserve",
+          "release_op_id": null,
+          "created_at": "2026-11-05T04:00:04.959Z",
+          "released_at": null
+        }
+      ],
+      "ledger": [
+        {
+          "seq": 8,
+          "entry_id": "C4",
+          "kind": "charge",
+          "customer_id": "CUS-AN",
+          "order_id": "O5",
+          "amount": 350000,
+          "status": "CHARGED",
+          "ref_charge_id": null,
+          "reason": null,
+          "balance_after": 1300000,
+          "op_id": "S5:charge",
+          "at": "2026-11-05T04:00:04.970Z"
+        }
+      ],
+      "label": "khi-payment-dung"
+    },
+    {
+      "at": "2026-11-05T04:00:08.888Z",
+      "order_id": "O5",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "api"
+      },
+      "order": {
+        "order_id": "O5",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-TAINGHE",
+        "item_name": "Tai nghe Bluetooth",
+        "quantity": 1,
+        "unit_price": 350000,
+        "amount": 350000,
+        "status": "CONFIRMED",
+        "terminal": true,
+        "reason": null,
+        "scenario": "F4",
+        "created_at": "2026-11-05T04:00:04.952Z",
+        "updated_at": "2026-11-05T04:00:08.785Z",
+        "saga": {
+          "saga_id": "S5",
+          "status": "CONFIRMED",
+          "phase": "done",
+          "intent": null,
+          "pending": [],
+          "reservation_id": "R4",
+          "charge_id": "C4",
+          "failed_charge_id": null,
+          "refund_id": null,
+          "last_error": null,
+          "attempts": 0,
+          "next_attempt_at": null
+        },
+        "steps": [
+          {
+            "seq": 29,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.952Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S5:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O5 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S5 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 30,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.958Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S5:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S5:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 31,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.966Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S5:reserve",
+            "from_status": "PENDING",
+            "to_status": "RESERVED",
+            "detail": "Kho giữ hàng R4 (còn 8)",
+            "pid": 15456
+          },
+          {
+            "seq": 32,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:04.968Z",
+            "kind": "INTENT",
+            "step": "charge",
+            "op_id": "S5:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Ghi intent \"charge\" + op S5:charge vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 33,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:05.025Z",
+            "kind": "UNKNOWN",
+            "step": "charge",
+            "op_id": "S5:charge",
+            "from_status": "RESERVED",
+            "to_status": "RECOVERING",
+            "detail": "Chưa rõ kết quả charge (ECONNRESET) → RECOVERING, KHÔNG coi là thất bại, KHÔNG charge ID mới — thử lại sau 1s (lần 1)",
+            "pid": 15456
+          },
+          {
+            "seq": 34,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:06.748Z",
+            "kind": "QUERY",
+            "step": "charge",
+            "op_id": "S5:charge",
+            "from_status": "RECOVERING",
+            "to_status": "RECOVERING",
+            "detail": "Hỏi payment về op S5:charge: ECONNREFUSED → vẫn RECOVERING (chưa có bằng chứng) — thử lại sau 2s (lần 2)",
+            "pid": 15456
+          },
+          {
+            "seq": 35,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:08.780Z",
+            "kind": "OUTCOME",
+            "step": "charge",
+            "op_id": "S5:charge",
+            "from_status": "RECOVERING",
+            "to_status": "CHARGED",
+            "detail": "Ví đã trừ 350.000đ (charge C4) — biết qua query op S5:charge: SUCCEEDED → tiếp tục xác nhận",
+            "pid": 15456
+          },
+          {
+            "seq": 36,
+            "saga_id": "S5",
+            "order_id": "O5",
+            "at": "2026-11-05T04:00:08.785Z",
+            "kind": "OUTCOME",
+            "step": "confirm",
+            "op_id": "S5:confirm",
+            "from_status": "CHARGED",
+            "to_status": "CONFIRMED",
+            "detail": "Xác nhận đơn: CONFIRMED (local transaction trong Order DB)",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [
+        {
+          "seq": 4,
+          "reservation_id": "R4",
+          "order_id": "O5",
+          "sku": "SKU-TAINGHE",
+          "quantity": 1,
+          "status": "ACTIVE",
+          "reserve_op_id": "S5:reserve",
+          "release_op_id": null,
+          "created_at": "2026-11-05T04:00:04.959Z",
+          "released_at": null
+        }
+      ],
+      "ledger": [
+        {
+          "seq": 8,
+          "entry_id": "C4",
+          "kind": "charge",
+          "customer_id": "CUS-AN",
+          "order_id": "O5",
+          "amount": 350000,
+          "status": "CHARGED",
+          "ref_charge_id": null,
+          "reason": null,
+          "balance_after": 1300000,
+          "op_id": "S5:charge",
+          "at": "2026-11-05T04:00:04.970Z"
+        }
+      ],
+      "label": "cuoi"
+    }
+  ],
+  "extra": {
+    "recovery_ms": 679,
+    "oldPid": 25876,
+    "newPid": 27096,
+    "stillStatus": "RECOVERING"
+  },
+  "timeline": [
+    {
+      "at": "2026-11-05T04:00:04.944Z",
+      "event": "===== F4: Payment chết sau khi đã thu, trước response ====="
+    },
+    {
+      "at": "2026-11-05T04:00:04.948Z",
+      "event": "FAULT payment: charge.afterCommit=freeze (1 lần) → HTTP 200"
+    },
+    {
+      "at": "2026-11-05T04:00:04.959Z",
+      "event": "ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O5 / S5 (350000đ)"
+    },
+    {
+      "at": "2026-11-05T04:00:05.016Z",
+      "event": "MARKER payment.charge.committed (pid 25876, op S5:charge, C4)"
+    },
+    {
+      "at": "2026-11-05T04:00:05.019Z",
+      "event": "KILL payment pid=25876 (process thật bị dừng)"
+    },
+    {
+      "at": "2026-11-05T04:00:05.192Z",
+      "event": "SNAPSHOT khi-payment-dung\n[2026-11-05T04:00:05.175Z] Snapshot đơn O5\n  Order DB    (api): RECOVERING  phase=charge  intent=charge S5:charge  pending=[]\n  Inventory DB(api): R4 ACTIVE\n  Payment DB  (db-file (Payment không truy cập được: ECONNREFUSED)): C4 charge 350000 CHARGED op=S5:charge"
+    },
+    {
+      "at": "2026-11-05T04:00:08.208Z",
+      "event": "Sau 3 giây Payment vẫn chết: đơn O5 = RECOVERING (không terminal giả)"
+    },
+    {
+      "at": "2026-11-05T04:00:08.562Z",
+      "event": "START payment pid=27096 (process mới, cùng file DB)"
+    },
+    {
+      "at": "2026-11-05T04:00:08.887Z",
+      "event": "Hội tụ sau 679ms kể từ khi start Payment"
+    },
+    {
+      "at": "2026-11-05T04:00:08.896Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:08.888Z] Snapshot đơn O5\n  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R4 ACTIVE\n  Payment DB  (api): C4 charge 350000 CHARGED op=S5:charge"
+    },
+    {
+      "at": "2026-11-05T04:00:08.896Z",
+      "event": "ORACLE F4: ĐẠT 8/8"
+    }
+  ]
+}

@@ -1,0 +1,214 @@
+[
+  {
+    "id": "H0",
+    "order_id": "O1",
+    "ok": true,
+    "passed": 6,
+    "total": 6,
+    "mid": null,
+    "final": "CONFIRMED",
+    "ledger": [
+      {
+        "seq": 4,
+        "entry_id": "C1",
+        "kind": "charge",
+        "customer_id": "CUS-AN",
+        "order_id": "O1",
+        "amount": 350000,
+        "status": "CHARGED",
+        "ref_charge_id": null,
+        "reason": null,
+        "balance_after": 1650000,
+        "op_id": "S1:charge",
+        "at": "2026-11-05T04:00:04.242Z"
+      }
+    ],
+    "extra": {}
+  },
+  {
+    "id": "F1",
+    "order_id": "O2",
+    "ok": true,
+    "passed": 5,
+    "total": 5,
+    "mid": null,
+    "final": "CANCELLED",
+    "ledger": [],
+    "extra": {}
+  },
+  {
+    "id": "F2",
+    "order_id": "O3",
+    "ok": true,
+    "passed": 5,
+    "total": 5,
+    "mid": null,
+    "final": "CANCELLED",
+    "ledger": [
+      {
+        "seq": 5,
+        "entry_id": "C2",
+        "kind": "charge",
+        "customer_id": "CUS-BINH",
+        "order_id": "O3",
+        "amount": 900000,
+        "status": "FAILED",
+        "ref_charge_id": null,
+        "reason": "INSUFFICIENT_FUNDS",
+        "balance_after": 300000,
+        "op_id": "S3:charge",
+        "at": "2026-11-05T04:00:04.611Z"
+      }
+    ],
+    "extra": {}
+  },
+  {
+    "id": "F3",
+    "order_id": "O4",
+    "ok": true,
+    "passed": 7,
+    "total": 7,
+    "mid": null,
+    "final": "CANCELLED",
+    "ledger": [
+      {
+        "seq": 6,
+        "entry_id": "C3",
+        "kind": "charge",
+        "customer_id": "CUS-AN",
+        "order_id": "O4",
+        "amount": 350000,
+        "status": "CHARGED",
+        "ref_charge_id": null,
+        "reason": null,
+        "balance_after": 1300000,
+        "op_id": "S4:charge",
+        "at": "2026-11-05T04:00:04.787Z"
+      },
+      {
+        "seq": 7,
+        "entry_id": "RF1",
+        "kind": "refund",
+        "customer_id": "CUS-AN",
+        "order_id": "O4",
+        "amount": 350000,
+        "status": "REFUNDED",
+        "ref_charge_id": "C3",
+        "reason": "Hoàn tiền (bù)",
+        "balance_after": 1650000,
+        "op_id": "S4:refund",
+        "at": "2026-11-05T04:00:04.798Z"
+      }
+    ],
+    "extra": {}
+  },
+  {
+    "id": "F4",
+    "order_id": "O5",
+    "ok": true,
+    "passed": 8,
+    "total": 8,
+    "mid": "RECOVERING",
+    "final": "CONFIRMED",
+    "ledger": [
+      {
+        "seq": 8,
+        "entry_id": "C4",
+        "kind": "charge",
+        "customer_id": "CUS-AN",
+        "order_id": "O5",
+        "amount": 350000,
+        "status": "CHARGED",
+        "ref_charge_id": null,
+        "reason": null,
+        "balance_after": 1300000,
+        "op_id": "S5:charge",
+        "at": "2026-11-05T04:00:04.970Z"
+      }
+    ],
+    "extra": {
+      "recovery_ms": 679,
+      "oldPid": 25876,
+      "newPid": 27096,
+      "stillStatus": "RECOVERING"
+    }
+  },
+  {
+    "id": "F5",
+    "order_id": "O6",
+    "ok": true,
+    "passed": 8,
+    "total": 8,
+    "mid": "COMPENSATING",
+    "final": "CANCELLED",
+    "ledger": [
+      {
+        "seq": 9,
+        "entry_id": "C5",
+        "kind": "charge",
+        "customer_id": "CUS-AN",
+        "order_id": "O6",
+        "amount": 350000,
+        "status": "CHARGED",
+        "ref_charge_id": null,
+        "reason": null,
+        "balance_after": 950000,
+        "op_id": "S6:charge",
+        "at": "2026-11-05T04:00:08.941Z"
+      },
+      {
+        "seq": 10,
+        "entry_id": "RF2",
+        "kind": "refund",
+        "customer_id": "CUS-AN",
+        "order_id": "O6",
+        "amount": 350000,
+        "status": "REFUNDED",
+        "ref_charge_id": "C5",
+        "reason": "Hoàn tiền (bù)",
+        "balance_after": 1300000,
+        "op_id": "S6:refund",
+        "at": "2026-11-05T04:00:12.800Z"
+      }
+    ],
+    "extra": {
+      "recovery_ms": 1290,
+      "stillStatus": "COMPENSATING",
+      "stillPending": [
+        "refund",
+        "release"
+      ]
+    }
+  },
+  {
+    "id": "F6",
+    "order_id": "O7",
+    "ok": true,
+    "passed": 9,
+    "total": 9,
+    "mid": "RESERVED",
+    "final": "CONFIRMED",
+    "ledger": [
+      {
+        "seq": 11,
+        "entry_id": "C6",
+        "kind": "charge",
+        "customer_id": "CUS-AN",
+        "order_id": "O7",
+        "amount": 200000,
+        "status": "CHARGED",
+        "ref_charge_id": null,
+        "reason": null,
+        "balance_after": 1100000,
+        "op_id": "S7:charge",
+        "at": "2026-11-05T04:00:12.917Z"
+      }
+    ],
+    "extra": {
+      "recovery_ms": 535,
+      "oldPid": 15456,
+      "newPid": 11928,
+      "opBefore": "S7:charge"
+    }
+  }
+]

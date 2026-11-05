@@ -1,0 +1,32 @@
+# F5 — Hoàn tiền lỗi tạm thời
+Đơn O6, saga S6. Oracle: Khi fault còn: COMPENSATING, pending refund + release. Gỡ fault, resume: refund 1 lần rồi release; cuối như F3.
+
+[2026-11-05T04:00:08.897Z] ===== F5: Hoàn tiền lỗi tạm thời =====
+[2026-11-05T04:00:08.900Z] FAULT order: confirm=reject (1 lần) → HTTP 200
+[2026-11-05T04:00:08.921Z] FAULT payment: refund=error503 (tới khi gỡ) → HTTP 200
+[2026-11-05T04:00:08.931Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O6 / S6 (350000đ)
+[2026-11-05T04:00:09.097Z] SNAPSHOT khi-refund-loi
+[2026-11-05T04:00:09.089Z] Snapshot đơn O6
+  Order DB    (api): COMPENSATING  phase=compensate  intent=refund S6:refund  pending=[refund, release]
+  Inventory DB(api): R5 ACTIVE
+  Payment DB  (api): C5 charge 350000 CHARGED op=S6:charge
+[2026-11-05T04:00:11.600Z] Sau 2.5 giây fault còn: COMPENSATING, pending [refund, release], lỗi gần nhất HTTP 503 TEMPORARY_UNAVAILABLE
+[2026-11-05T04:00:11.603Z] GỠ FAULT payment refund → HTTP 200
+[2026-11-05T04:00:12.891Z] Hội tụ sau 1290ms kể từ khi gỡ fault
+[2026-11-05T04:00:12.897Z] SNAPSHOT cuoi
+[2026-11-05T04:00:12.891Z] Snapshot đơn O6
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R5 RELEASED
+  Payment DB  (api): C5 charge 350000 CHARGED op=S6:charge | RF2 refund 350000 REFUNDED →C5 op=S6:refund
+[2026-11-05T04:00:12.898Z] ORACLE F5: ĐẠT 8/8
+
+Kiểm tra oracle:
+  ✓ Order CANCELLED (CANCELLED)
+  ✓ Không còn pending (-)
+  ✓ Reservation RELEASED (released 1, active 0)
+  ✓ Charge vẫn còn trong ledger (không xóa) (1)
+  ✓ Đúng 1 refund, trỏ đúng charge (1)
+  ✓ Refund trước release (theo seq) (46 < 48)
+  ✓ Tiền khách không mất (thu − hoàn = 0) (0)
+  ✓ Có lần refund lỗi tạm thời (có)
+KẾT LUẬN: ĐẠT

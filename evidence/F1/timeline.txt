@@ -1,0 +1,19 @@
+# F1 — Kho từ chối (hết hàng)
+Đơn O2, saga S2. Oracle: CANCELLED; không reservation active; không charge; không gọi charge sau reject.
+
+[2026-11-05T04:00:04.400Z] ===== F1: Kho từ chối (hết hàng) =====
+[2026-11-05T04:00:04.410Z] ĐẶT HÀNG CUS-AN mua SKU-LOA → O2 / S2 (500000đ)
+[2026-11-05T04:00:04.581Z] SNAPSHOT cuoi
+[2026-11-05T04:00:04.572Z] Snapshot đơn O2
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): không có reservation
+  Payment DB  (api): ledger trống
+[2026-11-05T04:00:04.582Z] ORACLE F1: ĐẠT 5/5
+
+Kiểm tra oracle:
+  ✓ Order CANCELLED (CANCELLED)
+  ✓ Không reservation (0)
+  ✓ Ledger không có charge/refund (0)
+  ✓ Không gọi charge sau reject (không gọi)
+  ✓ Tiền khách không mất (thu − hoàn = 0) (0)
+KẾT LUẬN: ĐẠT

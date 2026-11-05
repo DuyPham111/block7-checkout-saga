@@ -1,0 +1,564 @@
+{
+  "id": "F5",
+  "order_id": "O6",
+  "saga_id": "S6",
+  "check": {
+    "id": "F5",
+    "ok": true,
+    "checks": [
+      {
+        "label": "Order CANCELLED",
+        "ok": true,
+        "actual": "CANCELLED"
+      },
+      {
+        "label": "Không còn pending",
+        "ok": true,
+        "actual": "-"
+      },
+      {
+        "label": "Reservation RELEASED",
+        "ok": true,
+        "actual": "released 1, active 0"
+      },
+      {
+        "label": "Charge vẫn còn trong ledger (không xóa)",
+        "ok": true,
+        "actual": 1
+      },
+      {
+        "label": "Đúng 1 refund, trỏ đúng charge",
+        "ok": true,
+        "actual": 1
+      },
+      {
+        "label": "Refund trước release (theo seq)",
+        "ok": true,
+        "actual": "46 < 48"
+      },
+      {
+        "label": "Tiền khách không mất (thu − hoàn = 0)",
+        "ok": true,
+        "actual": 0
+      },
+      {
+        "label": "Có lần refund lỗi tạm thời",
+        "ok": true,
+        "actual": "có"
+      }
+    ],
+    "summary": {
+      "status": "CANCELLED",
+      "pending": [],
+      "resActive": 0,
+      "resReleased": 1,
+      "resTotal": 1,
+      "charged": 1,
+      "chargeFailed": 0,
+      "refunds": 1,
+      "refundLinked": true,
+      "chargeOps": [
+        "S6:charge"
+      ],
+      "sagaId": "S6",
+      "net": 0,
+      "amount": 350000,
+      "seqRefund": 46,
+      "seqRelease": 48,
+      "calledCharge": true,
+      "wentRecovering": false,
+      "refundTempFail": true,
+      "resumed": false,
+      "pids": [
+        15456
+      ]
+    }
+  },
+  "snaps": [
+    {
+      "at": "2026-11-05T04:00:09.089Z",
+      "order_id": "O6",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "api"
+      },
+      "order": {
+        "order_id": "O6",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-TAINGHE",
+        "item_name": "Tai nghe Bluetooth",
+        "quantity": 1,
+        "unit_price": 350000,
+        "amount": 350000,
+        "status": "COMPENSATING",
+        "terminal": false,
+        "reason": "CONFIRM_REJECTED",
+        "scenario": "F5",
+        "created_at": "2026-11-05T04:00:08.925Z",
+        "updated_at": "2026-11-05T04:00:08.958Z",
+        "saga": {
+          "saga_id": "S6",
+          "status": "COMPENSATING",
+          "phase": "compensate",
+          "intent": {
+            "step": "refund",
+            "op_id": "S6:refund"
+          },
+          "pending": [
+            "refund",
+            "release"
+          ],
+          "reservation_id": "R5",
+          "charge_id": "C5",
+          "failed_charge_id": null,
+          "refund_id": null,
+          "last_error": "HTTP 503 TEMPORARY_UNAVAILABLE",
+          "attempts": 1,
+          "next_attempt_at": "2026-11-05T04:00:09.958Z"
+        },
+        "steps": [
+          {
+            "seq": 37,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.925Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S6:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O6 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S6 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 38,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.930Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S6:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S6:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 39,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.936Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S6:reserve",
+            "from_status": "PENDING",
+            "to_status": "RESERVED",
+            "detail": "Kho giữ hàng R5 (còn 7)",
+            "pid": 15456
+          },
+          {
+            "seq": 40,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.939Z",
+            "kind": "INTENT",
+            "step": "charge",
+            "op_id": "S6:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Ghi intent \"charge\" + op S6:charge vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 41,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.947Z",
+            "kind": "OUTCOME",
+            "step": "charge",
+            "op_id": "S6:charge",
+            "from_status": "RESERVED",
+            "to_status": "CHARGED",
+            "detail": "Ví đã trừ 350.000đ (charge C5) → tiếp tục xác nhận",
+            "pid": 15456
+          },
+          {
+            "seq": 42,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.949Z",
+            "kind": "OUTCOME",
+            "step": "confirm",
+            "op_id": "S6:confirm",
+            "from_status": "CHARGED",
+            "to_status": "COMPENSATING",
+            "detail": "Xác nhận đơn bị từ chối TRƯỚC khi commit CONFIRMED → bù: hoàn tiền rồi nhả hàng",
+            "pid": 15456
+          },
+          {
+            "seq": 43,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.951Z",
+            "kind": "INTENT",
+            "step": "refund",
+            "op_id": "S6:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Ghi intent \"refund\" + op S6:refund vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 44,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.959Z",
+            "kind": "TEMP_FAIL",
+            "step": "refund",
+            "op_id": "S6:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Hoàn tiền lỗi tạm thời (HTTP 503 TEMPORARY_UNAVAILABLE) → giữ COMPENSATING, pending [refund, release] — thử lại sau 1s (lần 1)",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [
+        {
+          "seq": 5,
+          "reservation_id": "R5",
+          "order_id": "O6",
+          "sku": "SKU-TAINGHE",
+          "quantity": 1,
+          "status": "ACTIVE",
+          "reserve_op_id": "S6:reserve",
+          "release_op_id": null,
+          "created_at": "2026-11-05T04:00:08.930Z",
+          "released_at": null
+        }
+      ],
+      "ledger": [
+        {
+          "seq": 9,
+          "entry_id": "C5",
+          "kind": "charge",
+          "customer_id": "CUS-AN",
+          "order_id": "O6",
+          "amount": 350000,
+          "status": "CHARGED",
+          "ref_charge_id": null,
+          "reason": null,
+          "balance_after": 950000,
+          "op_id": "S6:charge",
+          "at": "2026-11-05T04:00:08.941Z"
+        }
+      ],
+      "label": "khi-refund-loi"
+    },
+    {
+      "at": "2026-11-05T04:00:12.891Z",
+      "order_id": "O6",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "api"
+      },
+      "order": {
+        "order_id": "O6",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-TAINGHE",
+        "item_name": "Tai nghe Bluetooth",
+        "quantity": 1,
+        "unit_price": 350000,
+        "amount": 350000,
+        "status": "CANCELLED",
+        "terminal": true,
+        "reason": "CONFIRM_REJECTED",
+        "scenario": "F5",
+        "created_at": "2026-11-05T04:00:08.925Z",
+        "updated_at": "2026-11-05T04:00:12.819Z",
+        "saga": {
+          "saga_id": "S6",
+          "status": "CANCELLED",
+          "phase": "done",
+          "intent": null,
+          "pending": [],
+          "reservation_id": "R5",
+          "charge_id": "C5",
+          "failed_charge_id": null,
+          "refund_id": "RF2",
+          "last_error": null,
+          "attempts": 0,
+          "next_attempt_at": null
+        },
+        "steps": [
+          {
+            "seq": 37,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.925Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S6:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O6 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S6 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 38,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.930Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S6:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S6:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 39,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.936Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S6:reserve",
+            "from_status": "PENDING",
+            "to_status": "RESERVED",
+            "detail": "Kho giữ hàng R5 (còn 7)",
+            "pid": 15456
+          },
+          {
+            "seq": 40,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.939Z",
+            "kind": "INTENT",
+            "step": "charge",
+            "op_id": "S6:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Ghi intent \"charge\" + op S6:charge vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 41,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.947Z",
+            "kind": "OUTCOME",
+            "step": "charge",
+            "op_id": "S6:charge",
+            "from_status": "RESERVED",
+            "to_status": "CHARGED",
+            "detail": "Ví đã trừ 350.000đ (charge C5) → tiếp tục xác nhận",
+            "pid": 15456
+          },
+          {
+            "seq": 42,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.949Z",
+            "kind": "OUTCOME",
+            "step": "confirm",
+            "op_id": "S6:confirm",
+            "from_status": "CHARGED",
+            "to_status": "COMPENSATING",
+            "detail": "Xác nhận đơn bị từ chối TRƯỚC khi commit CONFIRMED → bù: hoàn tiền rồi nhả hàng",
+            "pid": 15456
+          },
+          {
+            "seq": 43,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.951Z",
+            "kind": "INTENT",
+            "step": "refund",
+            "op_id": "S6:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Ghi intent \"refund\" + op S6:refund vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 44,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:08.959Z",
+            "kind": "TEMP_FAIL",
+            "step": "refund",
+            "op_id": "S6:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Hoàn tiền lỗi tạm thời (HTTP 503 TEMPORARY_UNAVAILABLE) → giữ COMPENSATING, pending [refund, release] — thử lại sau 1s (lần 1)",
+            "pid": 15456
+          },
+          {
+            "seq": 45,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:10.787Z",
+            "kind": "TEMP_FAIL",
+            "step": "refund",
+            "op_id": "S6:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Hoàn tiền lỗi tạm thời (HTTP 503 TEMPORARY_UNAVAILABLE) → giữ COMPENSATING, pending [refund, release] — thử lại sau 2s (lần 2)",
+            "pid": 15456
+          },
+          {
+            "seq": 46,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:12.808Z",
+            "kind": "OUTCOME",
+            "step": "refund",
+            "op_id": "S6:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Hoàn 350.000đ về ví (refund RF2 → C5); dòng charge vẫn giữ trong ledger",
+            "pid": 15456
+          },
+          {
+            "seq": 47,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:12.810Z",
+            "kind": "INTENT",
+            "step": "release",
+            "op_id": "S6:release",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Ghi intent \"release\" + op S6:release vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 48,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:12.818Z",
+            "kind": "OUTCOME",
+            "step": "release",
+            "op_id": "S6:release",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Nhả hàng R5 về kho (còn 8)",
+            "pid": 15456
+          },
+          {
+            "seq": 49,
+            "saga_id": "S6",
+            "order_id": "O6",
+            "at": "2026-11-05T04:00:12.820Z",
+            "kind": "OUTCOME",
+            "step": "cancel",
+            "op_id": "S6:cancel",
+            "from_status": "COMPENSATING",
+            "to_status": "CANCELLED",
+            "detail": "Hủy đơn: CANCELLED (mọi tác động đã được bù xong)",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [
+        {
+          "seq": 5,
+          "reservation_id": "R5",
+          "order_id": "O6",
+          "sku": "SKU-TAINGHE",
+          "quantity": 1,
+          "status": "RELEASED",
+          "reserve_op_id": "S6:reserve",
+          "release_op_id": "S6:release",
+          "created_at": "2026-11-05T04:00:08.930Z",
+          "released_at": "2026-11-05T04:00:12.811Z"
+        }
+      ],
+      "ledger": [
+        {
+          "seq": 9,
+          "entry_id": "C5",
+          "kind": "charge",
+          "customer_id": "CUS-AN",
+          "order_id": "O6",
+          "amount": 350000,
+          "status": "CHARGED",
+          "ref_charge_id": null,
+          "reason": null,
+          "balance_after": 950000,
+          "op_id": "S6:charge",
+          "at": "2026-11-05T04:00:08.941Z"
+        },
+        {
+          "seq": 10,
+          "entry_id": "RF2",
+          "kind": "refund",
+          "customer_id": "CUS-AN",
+          "order_id": "O6",
+          "amount": 350000,
+          "status": "REFUNDED",
+          "ref_charge_id": "C5",
+          "reason": "Hoàn tiền (bù)",
+          "balance_after": 1300000,
+          "op_id": "S6:refund",
+          "at": "2026-11-05T04:00:12.800Z"
+        }
+      ],
+      "label": "cuoi"
+    }
+  ],
+  "extra": {
+    "recovery_ms": 1290,
+    "stillStatus": "COMPENSATING",
+    "stillPending": [
+      "refund",
+      "release"
+    ]
+  },
+  "timeline": [
+    {
+      "at": "2026-11-05T04:00:08.897Z",
+      "event": "===== F5: Hoàn tiền lỗi tạm thời ====="
+    },
+    {
+      "at": "2026-11-05T04:00:08.900Z",
+      "event": "FAULT order: confirm=reject (1 lần) → HTTP 200"
+    },
+    {
+      "at": "2026-11-05T04:00:08.921Z",
+      "event": "FAULT payment: refund=error503 (tới khi gỡ) → HTTP 200"
+    },
+    {
+      "at": "2026-11-05T04:00:08.931Z",
+      "event": "ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O6 / S6 (350000đ)"
+    },
+    {
+      "at": "2026-11-05T04:00:09.097Z",
+      "event": "SNAPSHOT khi-refund-loi\n[2026-11-05T04:00:09.089Z] Snapshot đơn O6\n  Order DB    (api): COMPENSATING  phase=compensate  intent=refund S6:refund  pending=[refund, release]\n  Inventory DB(api): R5 ACTIVE\n  Payment DB  (api): C5 charge 350000 CHARGED op=S6:charge"
+    },
+    {
+      "at": "2026-11-05T04:00:11.600Z",
+      "event": "Sau 2.5 giây fault còn: COMPENSATING, pending [refund, release], lỗi gần nhất HTTP 503 TEMPORARY_UNAVAILABLE"
+    },
+    {
+      "at": "2026-11-05T04:00:11.603Z",
+      "event": "GỠ FAULT payment refund → HTTP 200"
+    },
+    {
+      "at": "2026-11-05T04:00:12.891Z",
+      "event": "Hội tụ sau 1290ms kể từ khi gỡ fault"
+    },
+    {
+      "at": "2026-11-05T04:00:12.897Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:12.891Z] Snapshot đơn O6\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R5 RELEASED\n  Payment DB  (api): C5 charge 350000 CHARGED op=S6:charge | RF2 refund 350000 REFUNDED →C5 op=S6:refund"
+    },
+    {
+      "at": "2026-11-05T04:00:12.898Z",
+      "event": "ORACLE F5: ĐẠT 8/8"
+    }
+  ]
+}

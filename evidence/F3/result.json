@@ -1,0 +1,325 @@
+{
+  "id": "F3",
+  "order_id": "O4",
+  "saga_id": "S4",
+  "check": {
+    "id": "F3",
+    "ok": true,
+    "checks": [
+      {
+        "label": "Order CANCELLED",
+        "ok": true,
+        "actual": "CANCELLED"
+      },
+      {
+        "label": "Không còn pending",
+        "ok": true,
+        "actual": "-"
+      },
+      {
+        "label": "Reservation RELEASED",
+        "ok": true,
+        "actual": "released 1, active 0"
+      },
+      {
+        "label": "Charge vẫn còn trong ledger (không xóa)",
+        "ok": true,
+        "actual": 1
+      },
+      {
+        "label": "Đúng 1 refund, trỏ đúng charge",
+        "ok": true,
+        "actual": 1
+      },
+      {
+        "label": "Refund trước release (theo seq)",
+        "ok": true,
+        "actual": "25 < 27"
+      },
+      {
+        "label": "Tiền khách không mất (thu − hoàn = 0)",
+        "ok": true,
+        "actual": 0
+      }
+    ],
+    "summary": {
+      "status": "CANCELLED",
+      "pending": [],
+      "resActive": 0,
+      "resReleased": 1,
+      "resTotal": 1,
+      "charged": 1,
+      "chargeFailed": 0,
+      "refunds": 1,
+      "refundLinked": true,
+      "chargeOps": [
+        "S4:charge"
+      ],
+      "sagaId": "S4",
+      "net": 0,
+      "amount": 350000,
+      "seqRefund": 25,
+      "seqRelease": 27,
+      "calledCharge": true,
+      "wentRecovering": false,
+      "refundTempFail": false,
+      "resumed": false,
+      "pids": [
+        15456
+      ]
+    }
+  },
+  "snaps": [
+    {
+      "at": "2026-11-05T04:00:04.936Z",
+      "order_id": "O4",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "api"
+      },
+      "order": {
+        "order_id": "O4",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-TAINGHE",
+        "item_name": "Tai nghe Bluetooth",
+        "quantity": 1,
+        "unit_price": 350000,
+        "amount": 350000,
+        "status": "CANCELLED",
+        "terminal": true,
+        "reason": "CONFIRM_REJECTED",
+        "scenario": "F3",
+        "created_at": "2026-11-05T04:00:04.772Z",
+        "updated_at": "2026-11-05T04:00:04.814Z",
+        "saga": {
+          "saga_id": "S4",
+          "status": "CANCELLED",
+          "phase": "done",
+          "intent": null,
+          "pending": [],
+          "reservation_id": "R3",
+          "charge_id": "C3",
+          "failed_charge_id": null,
+          "refund_id": "RF1",
+          "last_error": null,
+          "attempts": 0,
+          "next_attempt_at": null
+        },
+        "steps": [
+          {
+            "seq": 18,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.772Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S4:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O4 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S4 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 19,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.777Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S4:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S4:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 20,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.783Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S4:reserve",
+            "from_status": "PENDING",
+            "to_status": "RESERVED",
+            "detail": "Kho giữ hàng R3 (còn 8)",
+            "pid": 15456
+          },
+          {
+            "seq": 21,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.785Z",
+            "kind": "INTENT",
+            "step": "charge",
+            "op_id": "S4:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Ghi intent \"charge\" + op S4:charge vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 22,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.793Z",
+            "kind": "OUTCOME",
+            "step": "charge",
+            "op_id": "S4:charge",
+            "from_status": "RESERVED",
+            "to_status": "CHARGED",
+            "detail": "Ví đã trừ 350.000đ (charge C3) → tiếp tục xác nhận",
+            "pid": 15456
+          },
+          {
+            "seq": 23,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.795Z",
+            "kind": "OUTCOME",
+            "step": "confirm",
+            "op_id": "S4:confirm",
+            "from_status": "CHARGED",
+            "to_status": "COMPENSATING",
+            "detail": "Xác nhận đơn bị từ chối TRƯỚC khi commit CONFIRMED → bù: hoàn tiền rồi nhả hàng",
+            "pid": 15456
+          },
+          {
+            "seq": 24,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.797Z",
+            "kind": "INTENT",
+            "step": "refund",
+            "op_id": "S4:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Ghi intent \"refund\" + op S4:refund vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 25,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.804Z",
+            "kind": "OUTCOME",
+            "step": "refund",
+            "op_id": "S4:refund",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Hoàn 350.000đ về ví (refund RF1 → C3); dòng charge vẫn giữ trong ledger",
+            "pid": 15456
+          },
+          {
+            "seq": 26,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.806Z",
+            "kind": "INTENT",
+            "step": "release",
+            "op_id": "S4:release",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Ghi intent \"release\" + op S4:release vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 27,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.812Z",
+            "kind": "OUTCOME",
+            "step": "release",
+            "op_id": "S4:release",
+            "from_status": "COMPENSATING",
+            "to_status": "COMPENSATING",
+            "detail": "Nhả hàng R3 về kho (còn 9)",
+            "pid": 15456
+          },
+          {
+            "seq": 28,
+            "saga_id": "S4",
+            "order_id": "O4",
+            "at": "2026-11-05T04:00:04.814Z",
+            "kind": "OUTCOME",
+            "step": "cancel",
+            "op_id": "S4:cancel",
+            "from_status": "COMPENSATING",
+            "to_status": "CANCELLED",
+            "detail": "Hủy đơn: CANCELLED (mọi tác động đã được bù xong)",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [
+        {
+          "seq": 3,
+          "reservation_id": "R3",
+          "order_id": "O4",
+          "sku": "SKU-TAINGHE",
+          "quantity": 1,
+          "status": "RELEASED",
+          "reserve_op_id": "S4:reserve",
+          "release_op_id": "S4:release",
+          "created_at": "2026-11-05T04:00:04.777Z",
+          "released_at": "2026-11-05T04:00:04.806Z"
+        }
+      ],
+      "ledger": [
+        {
+          "seq": 6,
+          "entry_id": "C3",
+          "kind": "charge",
+          "customer_id": "CUS-AN",
+          "order_id": "O4",
+          "amount": 350000,
+          "status": "CHARGED",
+          "ref_charge_id": null,
+          "reason": null,
+          "balance_after": 1300000,
+          "op_id": "S4:charge",
+          "at": "2026-11-05T04:00:04.787Z"
+        },
+        {
+          "seq": 7,
+          "entry_id": "RF1",
+          "kind": "refund",
+          "customer_id": "CUS-AN",
+          "order_id": "O4",
+          "amount": 350000,
+          "status": "REFUNDED",
+          "ref_charge_id": "C3",
+          "reason": "Hoàn tiền (bù)",
+          "balance_after": 1650000,
+          "op_id": "S4:refund",
+          "at": "2026-11-05T04:00:04.798Z"
+        }
+      ],
+      "label": "cuoi"
+    }
+  ],
+  "extra": {},
+  "timeline": [
+    {
+      "at": "2026-11-05T04:00:04.764Z",
+      "event": "===== F3: Xác nhận đơn bị từ chối sau khi đã thu tiền ====="
+    },
+    {
+      "at": "2026-11-05T04:00:04.768Z",
+      "event": "FAULT order: confirm=reject (1 lần) → HTTP 200"
+    },
+    {
+      "at": "2026-11-05T04:00:04.778Z",
+      "event": "ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O4 / S4 (350000đ)"
+    },
+    {
+      "at": "2026-11-05T04:00:04.942Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.936Z] Snapshot đơn O4\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R3 RELEASED\n  Payment DB  (api): C3 charge 350000 CHARGED op=S4:charge | RF1 refund 350000 REFUNDED →C3 op=S4:refund"
+    },
+    {
+      "at": "2026-11-05T04:00:04.942Z",
+      "event": "ORACLE F3: ĐẠT 7/7"
+    }
+  ]
+}

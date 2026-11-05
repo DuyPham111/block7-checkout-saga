@@ -1,0 +1,33 @@
+# F6 — Orchestrator chết tại khoảng hở
+Đơn O7, saga S7. Oracle: Restart cùng DB, query/replay ID cũ. Cuối như H0; không nhân đôi charge, reservation; không mất việc.
+
+[2026-11-05T04:00:12.898Z] ===== F6: Orchestrator chết tại khoảng hở =====
+[2026-11-05T04:00:12.901Z] FAULT order: orchestrator.afterChargeCall=freeze (1 lần) → HTTP 200
+[2026-11-05T04:00:12.909Z] ĐẶT HÀNG CUS-AN mua SKU-CHUOT → O7 / S7 (200000đ)
+[2026-11-05T04:00:12.969Z] MARKER order.charge.afterCall (pid 15456, op S7:charge, C6)
+[2026-11-05T04:00:12.973Z] KILL order pid=15456 (process thật bị dừng)
+[2026-11-05T04:00:12.989Z] SNAPSHOT sau-khi-dung
+[2026-11-05T04:00:12.973Z] Snapshot đơn O7
+  Order DB    (db-file (Order không truy cập được: ECONNRESET)): RESERVED  phase=charge  intent=charge S7:charge  pending=[]
+  Inventory DB(api): R6 ACTIVE
+  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge
+[2026-11-05T04:00:13.354Z] START order pid=11928 (process mới, cùng file DB)
+[2026-11-05T04:00:13.524Z] Hội tụ sau 535ms kể từ khi start Order (pid 15456 → 11928), op trước restart S7:charge
+[2026-11-05T04:00:13.529Z] SNAPSHOT cuoi
+[2026-11-05T04:00:13.524Z] Snapshot đơn O7
+  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R6 ACTIVE
+  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge
+[2026-11-05T04:00:13.529Z] ORACLE F6: ĐẠT 9/9
+
+Kiểm tra oracle:
+  ✓ Order CONFIRMED (CONFIRMED)
+  ✓ Không còn pending (-)
+  ✓ Đúng 1 reservation ACTIVE (1/1)
+  ✓ Đúng 1 charge CHARGED (1)
+  ✓ Không refund (0)
+  ✓ Khách trả đúng tiền đơn (200000)
+  ✓ Có RESUME sau restart (có)
+  ✓ Chạy trên ≥ 2 process (PID khác nhau) (15456, 11928)
+  ✓ Charge dùng lại op ID cũ (S7:charge)
+KẾT LUẬN: ĐẠT

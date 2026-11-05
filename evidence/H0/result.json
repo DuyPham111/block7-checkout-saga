@@ -1,0 +1,237 @@
+{
+  "id": "H0",
+  "order_id": "O1",
+  "saga_id": "S1",
+  "check": {
+    "id": "H0",
+    "ok": true,
+    "checks": [
+      {
+        "label": "Order CONFIRMED",
+        "ok": true,
+        "actual": "CONFIRMED"
+      },
+      {
+        "label": "Không còn pending",
+        "ok": true,
+        "actual": "-"
+      },
+      {
+        "label": "Đúng 1 reservation ACTIVE",
+        "ok": true,
+        "actual": "1/1"
+      },
+      {
+        "label": "Đúng 1 charge CHARGED",
+        "ok": true,
+        "actual": 1
+      },
+      {
+        "label": "Không refund",
+        "ok": true,
+        "actual": 0
+      },
+      {
+        "label": "Khách trả đúng tiền đơn",
+        "ok": true,
+        "actual": 350000
+      }
+    ],
+    "summary": {
+      "status": "CONFIRMED",
+      "pending": [],
+      "resActive": 1,
+      "resReleased": 0,
+      "resTotal": 1,
+      "charged": 1,
+      "chargeFailed": 0,
+      "refunds": 0,
+      "refundLinked": false,
+      "chargeOps": [
+        "S1:charge"
+      ],
+      "sagaId": "S1",
+      "net": 350000,
+      "amount": 350000,
+      "seqRefund": null,
+      "seqRelease": null,
+      "calledCharge": true,
+      "wentRecovering": false,
+      "refundTempFail": false,
+      "resumed": false,
+      "pids": [
+        15456
+      ]
+    }
+  },
+  "snaps": [
+    {
+      "at": "2026-11-05T04:00:04.391Z",
+      "order_id": "O1",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "api"
+      },
+      "order": {
+        "order_id": "O1",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-TAINGHE",
+        "item_name": "Tai nghe Bluetooth",
+        "quantity": 1,
+        "unit_price": 350000,
+        "amount": 350000,
+        "status": "CONFIRMED",
+        "terminal": true,
+        "reason": null,
+        "scenario": "H0",
+        "created_at": "2026-11-05T04:00:04.222Z",
+        "updated_at": "2026-11-05T04:00:04.251Z",
+        "saga": {
+          "saga_id": "S1",
+          "status": "CONFIRMED",
+          "phase": "done",
+          "intent": null,
+          "pending": [],
+          "reservation_id": "R1",
+          "charge_id": "C1",
+          "failed_charge_id": null,
+          "refund_id": null,
+          "last_error": null,
+          "attempts": 0,
+          "next_attempt_at": null
+        },
+        "steps": [
+          {
+            "seq": 1,
+            "saga_id": "S1",
+            "order_id": "O1",
+            "at": "2026-11-05T04:00:04.222Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S1:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O1 (1 × Tai nghe Bluetooth, 350.000đ) + Saga record S1 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 2,
+            "saga_id": "S1",
+            "order_id": "O1",
+            "at": "2026-11-05T04:00:04.226Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S1:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S1:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 3,
+            "saga_id": "S1",
+            "order_id": "O1",
+            "at": "2026-11-05T04:00:04.235Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S1:reserve",
+            "from_status": "PENDING",
+            "to_status": "RESERVED",
+            "detail": "Kho giữ hàng R1 (còn 9)",
+            "pid": 15456
+          },
+          {
+            "seq": 4,
+            "saga_id": "S1",
+            "order_id": "O1",
+            "at": "2026-11-05T04:00:04.238Z",
+            "kind": "INTENT",
+            "step": "charge",
+            "op_id": "S1:charge",
+            "from_status": "RESERVED",
+            "to_status": "RESERVED",
+            "detail": "Ghi intent \"charge\" + op S1:charge vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 5,
+            "saga_id": "S1",
+            "order_id": "O1",
+            "at": "2026-11-05T04:00:04.249Z",
+            "kind": "OUTCOME",
+            "step": "charge",
+            "op_id": "S1:charge",
+            "from_status": "RESERVED",
+            "to_status": "CHARGED",
+            "detail": "Ví đã trừ 350.000đ (charge C1) → tiếp tục xác nhận",
+            "pid": 15456
+          },
+          {
+            "seq": 6,
+            "saga_id": "S1",
+            "order_id": "O1",
+            "at": "2026-11-05T04:00:04.251Z",
+            "kind": "OUTCOME",
+            "step": "confirm",
+            "op_id": "S1:confirm",
+            "from_status": "CHARGED",
+            "to_status": "CONFIRMED",
+            "detail": "Xác nhận đơn: CONFIRMED (local transaction trong Order DB)",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [
+        {
+          "seq": 1,
+          "reservation_id": "R1",
+          "order_id": "O1",
+          "sku": "SKU-TAINGHE",
+          "quantity": 1,
+          "status": "ACTIVE",
+          "reserve_op_id": "S1:reserve",
+          "release_op_id": null,
+          "created_at": "2026-11-05T04:00:04.228Z",
+          "released_at": null
+        }
+      ],
+      "ledger": [
+        {
+          "seq": 4,
+          "entry_id": "C1",
+          "kind": "charge",
+          "customer_id": "CUS-AN",
+          "order_id": "O1",
+          "amount": 350000,
+          "status": "CHARGED",
+          "ref_charge_id": null,
+          "reason": null,
+          "balance_after": 1650000,
+          "op_id": "S1:charge",
+          "at": "2026-11-05T04:00:04.242Z"
+        }
+      ],
+      "label": "cuoi"
+    }
+  ],
+  "extra": {},
+  "timeline": [
+    {
+      "at": "2026-11-05T04:00:04.190Z",
+      "event": "===== H0: Thành công ====="
+    },
+    {
+      "at": "2026-11-05T04:00:04.226Z",
+      "event": "ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O1 / S1 (350000đ)"
+    },
+    {
+      "at": "2026-11-05T04:00:04.398Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.391Z] Snapshot đơn O1\n  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]\n  Inventory DB(api): R1 ACTIVE\n  Payment DB  (api): C1 charge 350000 CHARGED op=S1:charge"
+    },
+    {
+      "at": "2026-11-05T04:00:04.398Z",
+      "event": "ORACLE H0: ĐẠT 6/6"
+    }
+  ]
+}

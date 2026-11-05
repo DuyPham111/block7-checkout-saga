@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saga Shop — Checkout Saga</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">S</span><div><b>Saga Shop</b><small>Order · Inventory · Payment — 3 process, 3 DB</small></div></div>
+  <div class="health" id="health"></div>
+</header>
+<nav class="tabs" id="tabs">
+  <button data-tab="shop" class="on">🛒 Mua hàng <small>góc khách hàng</small></button>
+  <button data-tab="stock">📦 Kho <small>góc thủ kho</small></button>
+  <button data-tab="wallet">💳 Ví tiền <small>góc thanh toán</small></button>
+  <button data-tab="matrix">🧪 Ma trận kịch bản <small>H0 · F1–F6</small></button>
+</nav>
+<main>
+  <!-- ============ KHÁCH HÀNG ============ -->
+  <section id="tab-shop" class="tab on">
+    <div class="grid2">
+      <div class="card">
+        <h2>Khách hàng</h2>
+        <label>Đang mua với tư cách
+          <select id="customer"></select>
+        </label>
+        <div id="wallet-card" class="wallet-big"></div>
+        <label>Số lượng mỗi lần mua
+          <input id="qty" type="number" min="1" value="1">
+        </label>
+        <div id="buy-msg" class="msg"></div>
+      </div>
+      <div class="card">
+        <h2>Sản phẩm</h2>
+        <div id="products" class="products"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row"><h2>Lịch sử đơn hàng</h2>
+        <label class="inline"><input type="checkbox" id="all-customers"> xem đơn của tất cả khách</label>
+      </div>
+      <div class="chips" id="order-filter"></div>
+      <div id="orders"></div>
+    </div>
+  </section>
+
+  <!-- ============ KHO ============ -->
+  <section id="tab-stock" class="tab">
+    <div class="stats" id="stock-stats"></div>
+    <div class="grid2">
+      <div class="card">
+        <h2>Tồn kho hiện tại</h2>
+        <div id="items"></div>
+        <div class="restock">
+          <b>Nhập hàng (hàng vào)</b>
+          <select id="restock-sku"></select>
+          <input id="restock-qty" type="number" min="1" value="5">
+          <button id="restock-btn" class="primary">Nhập kho</button>
+          <span id="restock-msg" class="msg"></span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Hàng đang giữ cho đơn (reservations)</h2>
+        <div id="reservations"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row"><h2>Lịch sử vào / ra kho</h2>
+        <select id="move-sku"><option value="">Tất cả sản phẩm</option></select></div>
+      <div id="movements"></div>
+    </div>
+  </section>
+
+  <!-- ============ VÍ ============ -->
+  <section id="tab-wallet" class="tab">
+    <div class="stats" id="pay-stats"></div>
+    <div class="card">
+      <h2>Ví khách hàng</h2>
+      <div id="wallets" class="wallets"></div>
+    </div>
+    <div class="card">
+      <div class="row"><h2>Danh sách giao dịch (ledger)</h2>
+        <select id="ledger-customer"><option value="">Tất cả khách</option></select></div>
+      <p class="hint">Ledger chỉ thêm dòng: thu tiền, hoàn tiền, nạp tiền. Hoàn tiền là dòng mới trỏ về dòng thu tiền — không xóa, không sửa lịch sử.</p>
+      <div id="ledger"></div>
+    </div>
+  </section>
+
+  <!-- ============ MA TRẬN ============ -->
+  <section id="tab-matrix" class="tab">
+    <div class="card">
+      <div class="row"><h2>Ma trận failure oracle</h2>
+        <div class="btns">
+          <button id="clear-faults">Gỡ mọi fault</button>
+          <button id="reset-lab" class="danger">Reset dữ liệu lab</button>
+        </div>
+      </div>
+      <p class="hint">Nút <b>Chạy</b> bật fault hook (nếu cần) rồi đặt một đơn mới. Cột Oracle kiểm tra bằng dữ liệu đọc qua API của cả 3 service. Kill / start process làm ở terminal.</p>
+      <div id="matrix"></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>Fault đang bật</h2>
+        <div id="faults"></div>
+      </div>
+      <div class="card">
+        <h2>Saga chưa kết thúc</h2>
+        <div id="open-sagas"></div>
+        <div class="restock"><b>Resume theo saga_id</b><input id="resume-id" placeholder="S4"><button id="resume-btn">Resume</button><span id="resume-msg" class="msg"></span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- chi tiết đơn -->
+<div class="drawer" id="drawer" hidden>
+  <div class="drawer-box">
+    <div class="row"><h2 id="d-title">Đơn</h2><button id="d-close">Đóng ✕</button></div>
+    <div id="d-body"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="oracle.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# F3 — Xác nhận đơn bị từ chối sau khi đã thu tiền
+Đơn O4, saga S4. Oracle: CANCELLED; 1 charge được refund đúng 1 lần; reservation released; trace refund trước release.
+
+[2026-11-05T04:00:04.764Z] ===== F3: Xác nhận đơn bị từ chối sau khi đã thu tiền =====
+[2026-11-05T04:00:04.768Z] FAULT order: confirm=reject (1 lần) → HTTP 200
+[2026-11-05T04:00:04.778Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O4 / S4 (350000đ)
+[2026-11-05T04:00:04.942Z] SNAPSHOT cuoi
+[2026-11-05T04:00:04.936Z] Snapshot đơn O4
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R3 RELEASED
+  Payment DB  (api): C3 charge 350000 CHARGED op=S4:charge | RF1 refund 350000 REFUNDED →C3 op=S4:refund
+[2026-11-05T04:00:04.942Z] ORACLE F3: ĐẠT 7/7
+
+Kiểm tra oracle:
+  ✓ Order CANCELLED (CANCELLED)
+  ✓ Không còn pending (-)
+  ✓ Reservation RELEASED (released 1, active 0)
+  ✓ Charge vẫn còn trong ledger (không xóa) (1)
+  ✓ Đúng 1 refund, trỏ đúng charge (1)
+  ✓ Refund trước release (theo seq) (25 < 27)
+  ✓ Tiền khách không mất (thu − hoàn = 0) (0)
+KẾT LUẬN: ĐẠT

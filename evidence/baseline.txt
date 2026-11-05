@@ -1,0 +1,10 @@
+[2026-11-05T04:14:45.633Z] Baseline checkout cho đơn BASE-85556 — khách CUS-CUONG, số dư trước: 1.000.000đ
+[2026-11-05T04:14:45.634Z] function checkout() { reserve(); charge(); confirm(); }   // không prepare, không vote, không bù
+[2026-11-05T04:14:45.670Z] 1. reserve → HTTP 201: R1 ACTIVE   (Inventory DB ĐÃ COMMIT)
+[2026-11-05T04:14:45.701Z] 2. charge  → HTTP 201: C1 CHARGED  (Payment DB ĐÃ COMMIT)
+[2026-11-05T04:14:45.702Z] 3. confirm → LỖI (giả lập): checkout ném exception, Order "rollback" đơn của mình… và dừng ở đó.
+[2026-11-05T04:14:45.710Z] KẾT QUẢ SAU "ROLLBACK":
+[2026-11-05T04:14:45.710Z]    Order DB     : không có đơn BASE-85556 (đã rollback)
+[2026-11-05T04:14:45.711Z]    Inventory DB : R1 ACTIVE  ← orphan reservation: hàng bị giữ cho đơn không tồn tại
+[2026-11-05T04:14:45.711Z]    Payment DB   : C1 CHARGED 350.000đ, số dư 1.000.000đ → 650.000đ  ← orphan charge: khách mất tiền
+[2026-11-05T04:14:45.711Z] => ROLLBACK của Order DB không chạm được tới DB của Inventory và Payment. Cần Saga + compensation.

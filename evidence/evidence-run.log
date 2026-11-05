@@ -1,0 +1,113 @@
+(đã reset dữ liệu lab về seed)
+[2026-11-05T04:00:04.190Z] ===== H0: Thành công =====
+[2026-11-05T04:00:04.226Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O1 / S1 (350000đ)
+[2026-11-05T04:00:04.398Z] SNAPSHOT cuoi
+[2026-11-05T04:00:04.391Z] Snapshot đơn O1
+  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R1 ACTIVE
+  Payment DB  (api): C1 charge 350000 CHARGED op=S1:charge
+[2026-11-05T04:00:04.398Z] ORACLE H0: ĐẠT 6/6
+
+[2026-11-05T04:00:04.400Z] ===== F1: Kho từ chối (hết hàng) =====
+[2026-11-05T04:00:04.410Z] ĐẶT HÀNG CUS-AN mua SKU-LOA → O2 / S2 (500000đ)
+[2026-11-05T04:00:04.581Z] SNAPSHOT cuoi
+[2026-11-05T04:00:04.572Z] Snapshot đơn O2
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): không có reservation
+  Payment DB  (api): ledger trống
+[2026-11-05T04:00:04.582Z] ORACLE F1: ĐẠT 5/5
+
+[2026-11-05T04:00:04.583Z] ===== F2: Thanh toán thất bại (ví không đủ) =====
+[2026-11-05T04:00:04.596Z] ĐẶT HÀNG CUS-BINH mua SKU-BANPHIM → O3 / S3 (900000đ)
+[2026-11-05T04:00:04.762Z] SNAPSHOT cuoi
+[2026-11-05T04:00:04.757Z] Snapshot đơn O3
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R2 RELEASED
+  Payment DB  (api): C2 charge 900000 FAILED op=S3:charge
+[2026-11-05T04:00:04.763Z] ORACLE F2: ĐẠT 5/5
+
+[2026-11-05T04:00:04.764Z] ===== F3: Xác nhận đơn bị từ chối sau khi đã thu tiền =====
+[2026-11-05T04:00:04.768Z] FAULT order: confirm=reject (1 lần) → HTTP 200
+[2026-11-05T04:00:04.778Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O4 / S4 (350000đ)
+[2026-11-05T04:00:04.942Z] SNAPSHOT cuoi
+[2026-11-05T04:00:04.936Z] Snapshot đơn O4
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R3 RELEASED
+  Payment DB  (api): C3 charge 350000 CHARGED op=S4:charge | RF1 refund 350000 REFUNDED →C3 op=S4:refund
+[2026-11-05T04:00:04.942Z] ORACLE F3: ĐẠT 7/7
+
+[2026-11-05T04:00:04.944Z] ===== F4: Payment chết sau khi đã thu, trước response =====
+[2026-11-05T04:00:04.948Z] FAULT payment: charge.afterCommit=freeze (1 lần) → HTTP 200
+[2026-11-05T04:00:04.959Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O5 / S5 (350000đ)
+[2026-11-05T04:00:05.016Z] MARKER payment.charge.committed (pid 25876, op S5:charge, C4)
+[2026-11-05T04:00:05.019Z] KILL payment pid=25876 (process thật bị dừng)
+[2026-11-05T04:00:05.192Z] SNAPSHOT khi-payment-dung
+[2026-11-05T04:00:05.175Z] Snapshot đơn O5
+  Order DB    (api): RECOVERING  phase=charge  intent=charge S5:charge  pending=[]
+  Inventory DB(api): R4 ACTIVE
+  Payment DB  (db-file (Payment không truy cập được: ECONNREFUSED)): C4 charge 350000 CHARGED op=S5:charge
+[2026-11-05T04:00:08.208Z] Sau 3 giây Payment vẫn chết: đơn O5 = RECOVERING (không terminal giả)
+[2026-11-05T04:00:08.562Z] START payment pid=27096 (process mới, cùng file DB)
+[2026-11-05T04:00:08.887Z] Hội tụ sau 679ms kể từ khi start Payment
+[2026-11-05T04:00:08.896Z] SNAPSHOT cuoi
+[2026-11-05T04:00:08.888Z] Snapshot đơn O5
+  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R4 ACTIVE
+  Payment DB  (api): C4 charge 350000 CHARGED op=S5:charge
+[2026-11-05T04:00:08.896Z] ORACLE F4: ĐẠT 8/8
+
+[2026-11-05T04:00:08.897Z] ===== F5: Hoàn tiền lỗi tạm thời =====
+[2026-11-05T04:00:08.900Z] FAULT order: confirm=reject (1 lần) → HTTP 200
+[2026-11-05T04:00:08.921Z] FAULT payment: refund=error503 (tới khi gỡ) → HTTP 200
+[2026-11-05T04:00:08.931Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O6 / S6 (350000đ)
+[2026-11-05T04:00:09.097Z] SNAPSHOT khi-refund-loi
+[2026-11-05T04:00:09.089Z] Snapshot đơn O6
+  Order DB    (api): COMPENSATING  phase=compensate  intent=refund S6:refund  pending=[refund, release]
+  Inventory DB(api): R5 ACTIVE
+  Payment DB  (api): C5 charge 350000 CHARGED op=S6:charge
+[2026-11-05T04:00:11.600Z] Sau 2.5 giây fault còn: COMPENSATING, pending [refund, release], lỗi gần nhất HTTP 503 TEMPORARY_UNAVAILABLE
+[2026-11-05T04:00:11.603Z] GỠ FAULT payment refund → HTTP 200
+[2026-11-05T04:00:12.891Z] Hội tụ sau 1290ms kể từ khi gỡ fault
+[2026-11-05T04:00:12.897Z] SNAPSHOT cuoi
+[2026-11-05T04:00:12.891Z] Snapshot đơn O6
+  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R5 RELEASED
+  Payment DB  (api): C5 charge 350000 CHARGED op=S6:charge | RF2 refund 350000 REFUNDED →C5 op=S6:refund
+[2026-11-05T04:00:12.898Z] ORACLE F5: ĐẠT 8/8
+
+[2026-11-05T04:00:12.898Z] ===== F6: Orchestrator chết tại khoảng hở =====
+[2026-11-05T04:00:12.901Z] FAULT order: orchestrator.afterChargeCall=freeze (1 lần) → HTTP 200
+[2026-11-05T04:00:12.909Z] ĐẶT HÀNG CUS-AN mua SKU-CHUOT → O7 / S7 (200000đ)
+[2026-11-05T04:00:12.969Z] MARKER order.charge.afterCall (pid 15456, op S7:charge, C6)
+[2026-11-05T04:00:12.973Z] KILL order pid=15456 (process thật bị dừng)
+[2026-11-05T04:00:12.989Z] SNAPSHOT sau-khi-dung
+[2026-11-05T04:00:12.973Z] Snapshot đơn O7
+  Order DB    (db-file (Order không truy cập được: ECONNRESET)): RESERVED  phase=charge  intent=charge S7:charge  pending=[]
+  Inventory DB(api): R6 ACTIVE
+  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge
+[2026-11-05T04:00:13.354Z] START order pid=11928 (process mới, cùng file DB)
+[2026-11-05T04:00:13.524Z] Hội tụ sau 535ms kể từ khi start Order (pid 15456 → 11928), op trước restart S7:charge
+[2026-11-05T04:00:13.529Z] SNAPSHOT cuoi
+[2026-11-05T04:00:13.524Z] Snapshot đơn O7
+  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R6 ACTIVE
+  Payment DB  (api): C6 charge 200000 CHARGED op=S7:charge
+[2026-11-05T04:00:13.529Z] ORACLE F6: ĐẠT 9/9
+
+# Evidence tổng hợp — H0, F1–F6
+
+Chạy lúc 2026-11-05T04:00:13.530Z bằng `npm run evidence` (reset dữ liệu lab, 3 process thật, kill/start thật cho F4 và F6).
+Cấu hình: timeout gọi service 2000ms · vòng phục hồi 1000ms · backoff 1000/2000/4000/5000ms.
+
+| ID | Tình huống | Đơn | Trạng thái giữa chừng | Trạng thái cuối | Ledger của đơn | Oracle | Thời gian hội tụ |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| H0 | Thành công | O1 | - | CONFIRMED | C1 charge CHARGED | ĐẠT 6/6 | - |
+| F1 | Kho từ chối (hết hàng) | O2 | - | CANCELLED | trống | ĐẠT 5/5 | - |
+| F2 | Thanh toán thất bại (ví không đủ) | O3 | - | CANCELLED | C2 charge FAILED | ĐẠT 5/5 | - |
+| F3 | Xác nhận đơn bị từ chối sau khi đã thu tiền | O4 | - | CANCELLED | C3 charge CHARGED, RF1 refund REFUNDED | ĐẠT 7/7 | - |
+| F4 | Payment chết sau khi đã thu, trước response | O5 | RECOVERING (khi-payment-dung) | CONFIRMED | C4 charge CHARGED | ĐẠT 8/8 | 679ms |
+| F5 | Hoàn tiền lỗi tạm thời | O6 | COMPENSATING (khi-refund-loi) | CANCELLED | C5 charge CHARGED, RF2 refund REFUNDED | ĐẠT 8/8 | 1290ms |
+| F6 | Orchestrator chết tại khoảng hở | O7 | RESERVED (sau-khi-dung) | CONFIRMED | C6 charge CHARGED | ĐẠT 9/9 | 535ms |
+
+Chi tiết từng tình huống: `evidence/<ID>/timeline.txt` (timeline + snapshot 3 kho) và `evidence/<ID>/result.json`.
+

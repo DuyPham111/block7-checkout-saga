@@ -1,0 +1,163 @@
+{
+  "id": "F1",
+  "order_id": "O2",
+  "saga_id": "S2",
+  "check": {
+    "id": "F1",
+    "ok": true,
+    "checks": [
+      {
+        "label": "Order CANCELLED",
+        "ok": true,
+        "actual": "CANCELLED"
+      },
+      {
+        "label": "Không reservation",
+        "ok": true,
+        "actual": 0
+      },
+      {
+        "label": "Ledger không có charge/refund",
+        "ok": true,
+        "actual": 0
+      },
+      {
+        "label": "Không gọi charge sau reject",
+        "ok": true,
+        "actual": "không gọi"
+      },
+      {
+        "label": "Tiền khách không mất (thu − hoàn = 0)",
+        "ok": true,
+        "actual": 0
+      }
+    ],
+    "summary": {
+      "status": "CANCELLED",
+      "pending": [],
+      "resActive": 0,
+      "resReleased": 0,
+      "resTotal": 0,
+      "charged": 0,
+      "chargeFailed": 0,
+      "refunds": 0,
+      "refundLinked": false,
+      "chargeOps": [],
+      "sagaId": "S2",
+      "net": 0,
+      "amount": 500000,
+      "seqRefund": null,
+      "seqRelease": null,
+      "calledCharge": false,
+      "wentRecovering": false,
+      "refundTempFail": false,
+      "resumed": false,
+      "pids": [
+        15456
+      ]
+    }
+  },
+  "snaps": [
+    {
+      "at": "2026-11-05T04:00:04.572Z",
+      "order_id": "O2",
+      "source": {
+        "order": "api",
+        "inventory": "api",
+        "payment": "api"
+      },
+      "order": {
+        "order_id": "O2",
+        "customer_id": "CUS-AN",
+        "sku": "SKU-LOA",
+        "item_name": "Loa mini",
+        "quantity": 1,
+        "unit_price": 500000,
+        "amount": 500000,
+        "status": "CANCELLED",
+        "terminal": true,
+        "reason": "OUT_OF_STOCK",
+        "scenario": "F1",
+        "created_at": "2026-11-05T04:00:04.406Z",
+        "updated_at": "2026-11-05T04:00:04.417Z",
+        "saga": {
+          "saga_id": "S2",
+          "status": "CANCELLED",
+          "phase": "done",
+          "intent": null,
+          "pending": [],
+          "reservation_id": null,
+          "charge_id": null,
+          "failed_charge_id": null,
+          "refund_id": null,
+          "last_error": null,
+          "attempts": 0,
+          "next_attempt_at": null
+        },
+        "steps": [
+          {
+            "seq": 7,
+            "saga_id": "S2",
+            "order_id": "O2",
+            "at": "2026-11-05T04:00:04.406Z",
+            "kind": "CREATE",
+            "step": "create",
+            "op_id": "S2:create",
+            "from_status": null,
+            "to_status": "PENDING",
+            "detail": "Tạo đơn O2 (1 × Loa mini, 500.000đ) + Saga record S2 trong 1 transaction",
+            "pid": 15456
+          },
+          {
+            "seq": 8,
+            "saga_id": "S2",
+            "order_id": "O2",
+            "at": "2026-11-05T04:00:04.410Z",
+            "kind": "INTENT",
+            "step": "reserve",
+            "op_id": "S2:reserve",
+            "from_status": "PENDING",
+            "to_status": "PENDING",
+            "detail": "Ghi intent \"reserve\" + op S2:reserve vào Order DB trước khi gọi",
+            "pid": 15456
+          },
+          {
+            "seq": 9,
+            "saga_id": "S2",
+            "order_id": "O2",
+            "at": "2026-11-05T04:00:04.417Z",
+            "kind": "OUTCOME",
+            "step": "reserve",
+            "op_id": "S2:reserve",
+            "from_status": "PENDING",
+            "to_status": "CANCELLED",
+            "detail": "Kho từ chối dứt khoát (OUT_OF_STOCK) → không gọi thu tiền, chưa có gì để bù → hủy đơn",
+            "pid": 15456
+          }
+        ]
+      },
+      "reservations": [],
+      "ledger": [],
+      "label": "cuoi"
+    }
+  ],
+  "extra": {},
+  "timeline": [
+    {
+      "at": "2026-11-05T04:00:04.400Z",
+      "event": "===== F1: Kho từ chối (hết hàng) ====="
+    },
+    {
+      "at": "2026-11-05T04:00:04.410Z",
+      "event": "ĐẶT HÀNG CUS-AN mua SKU-LOA → O2 / S2 (500000đ)"
+    },
+    {
+      "at": "2026-11-05T04:00:04.581Z",
+      "event": "SNAPSHOT cuoi\n[2026-11-05T04:00:04.572Z] Snapshot đơn O2\n  Order DB    (api): CANCELLED  phase=done  intent=-  pending=[]\n  Inventory DB(api): không có reservation\n  Payment DB  (api): ledger trống"
+    },
+    {
+      "at": "2026-11-05T04:00:04.582Z",
+      "event": "ORACLE F1: ĐẠT 5/5"
+    }
+  ]
+}

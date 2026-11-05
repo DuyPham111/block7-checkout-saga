@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout Saga — Block 7</title>
+<style>
+:root{
+  --bg:#0f1729; --stage:#ffffff; --text:#172033; --muted:#5d6880; --line:#dfe5ef; --soft:#f4f6fb;
+  --pri:#2458d6; --pri-soft:#e7eefc; --ok:#11804a; --ok-soft:#e2f5ea; --bad:#c0262f; --bad-soft:#fde9ea;
+  --warn:#a35d00; --warn-soft:#fff2db; --info:#5b3cc4; --info-soft:#eee9fd;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);font-family:"Segoe UI",system-ui,sans-serif;color:var(--text);overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;flex:none;position:relative;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--stage);border-radius:14px;padding:44px 56px 40px;display:none;flex-direction:column;overflow:hidden}
+.slide.on{display:flex}
+.slide h1{font-size:40px;margin:0 0 10px;line-height:1.15}
+.slide h2{font-size:30px;margin:0 0 4px;line-height:1.2}
+.slide .sub{color:var(--muted);font-size:17px;margin:0 0 18px}
+.kick{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pri);margin-bottom:6px}
+.foot{position:absolute;left:56px;right:56px;bottom:14px;display:flex;justify-content:space-between;font-size:12px;color:#9aa3b5}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px}
+.cols{display:grid;gap:16px;flex:1;min-height:0}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}.c4{grid-template-columns:repeat(4,1fr)}.c64{grid-template-columns:1.5fr 1fr}.c46{grid-template-columns:1fr 1.5fr}
+.card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff}
+.card h3{margin:0 0 6px;font-size:18px}
+.card p,.card li{font-size:15px;line-height:1.45;color:#2b3448}
+.card ul{margin:4px 0 0;padding-left:18px}
+.card.ok{background:var(--ok-soft);border-color:#b9e3c9}.card.bad{background:var(--bad-soft);border-color:#f3c3c7}.card.warn{background:var(--warn-soft);border-color:#f1d59f}.card.pri{background:var(--pri-soft);border-color:#c4d4f6}
+.big{font-size:44px;font-weight:800;line-height:1}
+.mono{font-family:Consolas,"JetBrains Mono",monospace}
+pre.term{margin:0;background:#0f1729;color:#dbe4f5;border-radius:10px;padding:12px 14px;font:13px/1.55 Consolas,monospace;white-space:pre-wrap}
+pre.term .r{color:#ff8f96}.term .g{color:#7fe0a6}.term .y{color:#ffd27a}.term .c{color:#8a96ad}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--soft);color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:12.5px;font-weight:700}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.bad{background:var(--bad-soft);color:var(--bad)}.tag.warn{background:var(--warn-soft);color:var(--warn)}.tag.pri{background:var(--pri-soft);color:var(--pri)}
+img.shot{width:100%;border-radius:10px;border:1px solid var(--line);box-shadow:0 4px 16px rgba(15,23,41,.12);display:block}
+.shotbox{display:flex;flex-direction:column;gap:6px;min-height:0}
+.shotbox .cap{font-size:13px;color:var(--muted);text-align:center}
+svg text{font-family:"Segoe UI",system-ui,sans-serif}
+.cover{background:linear-gradient(135deg,#2458d6 0%,#5b3cc4 100%);color:#fff;justify-content:center}
+.cover h1{font-size:54px}
+.cover .sub{color:#dfe6ff;font-size:20px}
+.cover .kick{color:#cfdbff}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 14px;font-size:15px}
+.agenda{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:10px}
+.agenda .card{min-height:220px}
+.agenda .n{font-size:40px;font-weight:800;color:var(--pri)}
+.note{font-size:15px;color:var(--muted)}
+.hl{background:#fff4c2;padding:0 4px;border-radius:4px}
+.btn{display:inline-block;background:var(--pri);color:#fff;text-decoration:none;border-radius:8px;padding:6px 14px;font-size:14px;font-weight:600}
+.bar{height:16px;border-radius:5px;background:var(--pri)}
+#nav{position:fixed;right:14px;bottom:10px;display:flex;gap:6px;align-items:center;color:#9aa3b5;font-size:13px;z-index:5;opacity:.3;transition:opacity .2s}#nav:hover{opacity:1}
+#nav button{background:#1f2a44;color:#dbe4f5;border:1px solid #33415f;border-radius:6px;padding:4px 10px;cursor:pointer}
+#progress{position:fixed;left:0;top:0;height:3px;background:#5b8cff;z-index:5;transition:width .2s}
+@media print{html,body{overflow:visible;background:#fff}#viewport{position:static;display:block}#deck{transform:none!important;width:auto;height:auto}.slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;border-radius:0}#nav,#progress{display:none}}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="deck">
+
+<!-- 1 -->
+<section class="slide cover" data-title="Mở đầu">
+  <div class="kick">Phát triển ứng dụng Web nâng cao · Block 7 · Nhóm 7</div>
+  <h1>Checkout Saga<br>Giao dịch phân tán qua 3 service</h1>
+  <p class="sub">Order · Inventory · Payment (ví tiền) — 3 process, 3 database riêng, orchestrator có Saga record bền vững, bù khi lỗi, tự phục hồi khi process bị kill.</p>
+  <div class="chips"><span class="chip">23127045</span><span class="chip">23127102</span><span class="chip">23127159</span><span class="chip">23127183</span><span class="chip">23127393</span></div>
+  <div class="chips"><span class="chip">28/28 test xanh</span><span class="chip">7/7 kịch bản H0, F1–F6 đạt oracle</span><span class="chip">Kill process thật</span></div>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-title="Nội dung">
+  <div class="kick">Nội dung</div>
+  <h2>Năm phần trình bày</h2>
+  <p class="sub">Theo đúng yêu cầu của bài: vấn đề → thiết kế → demo → bằng chứng → đánh đổi</p>
+  <div class="agenda">
+    <div class="card"><div class="n">1</div><h3>Vấn đề</h3><p>Checkout đi qua 3 DB. ROLLBACK một DB không gỡ được tiền đã thu ở DB khác.</p></div>
+    <div class="card"><div class="n">2</div><h3>Thiết kế</h3><p>Vì sao Saga thay vì 2PC. Kiến trúc, state machine, intent → call → outcome, operation ID.</p></div>
+    <div class="card"><div class="n">3</div><h3>Demo</h3><p>App thật với 3 góc nhìn: khách, kho, ví. H0, F1–F6, trong đó có kill Payment và kill orchestrator.</p></div>
+    <div class="card"><div class="n">4</div><h3>Bằng chứng</h3><p>28 test, oracle 7/7, snapshot 3 kho, marker, PID trước/sau restart.</p></div>
+    <div class="card"><div class="n">5</div><h3>Đánh đổi</h3><p>Mất isolation, bù có độ trễ, một orchestrator, chưa có outbox.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-title="Vấn đề">
+  <div class="kick">1 · Vấn đề</div>
+  <h2>Checkout báo lỗi, nhưng tiền đã bị thu</h2>
+  <p class="sub">Baseline cố ý sai: <span class="mono">reserve(); charge(); confirm();</span> — không prepare, không vote, không bù. Chạy bằng <span class="mono">npm run baseline</span></p>
+  <div class="cols c46">
+    <pre class="term"><span class="c">$ npm run baseline</span>
+Baseline checkout cho đơn BASE-82626 — CUS-CUONG, số dư 1.000.000đ
+1. reserve → 201: R7 ACTIVE   <span class="y">(Inventory DB ĐÃ COMMIT)</span>
+2. charge  → 201: C7 CHARGED  <span class="y">(Payment DB ĐÃ COMMIT)</span>
+3. confirm → <span class="r">LỖI</span>: Order "rollback" đơn của mình… và dừng.
+
+KẾT QUẢ SAU "ROLLBACK":
+  Order DB     : không có đơn (đã rollback)
+  Inventory DB : R7 ACTIVE   <span class="r">← orphan reservation</span>
+  Payment DB   : C7 CHARGED, 1.000.000đ → 650.000đ <span class="r">← orphan charge</span>
+
+<span class="g">=> ROLLBACK của Order DB không chạm được tới
+   DB của Inventory và Payment.</span></pre>
+    <div class="shotbox"><img class="shot" src="img/01-baseline-vi.jpg" alt="Ví của Cường bị trừ 350.000đ, không có hoàn tiền"><div class="cap">Tab Ví: Cường bị trừ 350.000đ cho đơn BASE không tồn tại, không có dòng hoàn tiền</div>
+      <div class="card bad"><p><b>Local ACID chỉ bảo vệ trong một DB.</b> Mỗi service sở hữu DB riêng và chỉ nói chuyện qua HTTP, nên không có transaction nào bao được cả ba.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-title="2PC, 3PC hay Saga">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>Vì sao chọn Saga, không chọn 2PC / 3PC</h2>
+  <p class="sub">Câu hỏi: làm sao để 3 DB cùng "thành công" hoặc cùng "không mất gì"?</p>
+  <div class="cols c3">
+    <div class="card"><h3>2PC — hỏi trước, chốt sau</h3><ul>
+      <li>Cần pha <b>PREPARE</b>: giữ tiền, chưa trừ hẳn, chờ lệnh.</li>
+      <li>Ví / cổng thanh toán chỉ có <span class="mono">charge</span>, <span class="mono">refund</span>, <span class="mono">query</span>.</li>
+      <li>Đã vote YES mà mất coordinator → <b>in-doubt</b>: không được tự abort, phải giữ khóa và chờ → <b>blocking</b>.</li></ul></div>
+    <div class="card"><h3>3PC — thêm PreCommit</h3><ul>
+      <li>Giảm chờ khi coordinator chết.</li>
+      <li>Chỉ đúng nếu <b>mạng đồng bộ</b> và lỗi kiểu <b>fail-stop</b>.</li>
+      <li>Mạng bị chia cắt → một phía commit, phía kia abort.</li>
+      <li>Chỉ học giới hạn, không cài đặt.</li></ul></div>
+    <div class="card ok"><h3>Saga — commit từng bước, lỗi thì bù</h3><ul>
+      <li>Mỗi bước là một <b>local transaction</b> trong DB của service đó.</li>
+      <li>Bước sau lỗi → chạy <b>compensation</b> theo thứ tự ngược: refund → release → cancel.</li>
+      <li>Compensation là thao tác <b>mới</b>, giữ lịch sử, không phải rollback.</li>
+      <li>Nhất quán nghiệp vụ <b>theo thời gian</b>.</li></ul></div>
+  </div>
+  <div class="card pri"><p><b>Orchestration</b> (một orchestrator trong Order ra quyết định + Saga record) thay vì choreography: dễ quan sát và test từng nhánh lỗi; lab chưa cần broker.</p></div>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-title="Kiến trúc">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>Kiến trúc: 4 process, 3 database riêng</h2>
+  <p class="sub">Chỉ bind 127.0.0.1. Không service nào đọc DB của service khác. UI đọc qua API.</p>
+  <svg viewBox="0 0 1170 490" style="width:100%;flex:1">
+    <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5d6880"/></marker></defs>
+    <rect x="10" y="6" width="1150" height="66" rx="14" fill="#e7eefc" stroke="#2458d6" stroke-width="2"/>
+    <text x="30" y="36" font-size="20" font-weight="700" fill="#172033">Web UI — process 4 · :3000</text>
+    <text x="30" y="58" font-size="14" fill="#5d6880">🛒 Mua hàng (khách) · 📦 Kho (thủ kho) · 💳 Ví tiền · 🧪 Ma trận H0–F6 — tự tải lại mỗi 1 giây</text>
+    <g font-size="14" fill="#2458d6"><text x="200" y="104">đọc/ghi qua API</text></g>
+    <path d="M190 74 V128" stroke="#2458d6" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a)"/>
+    <path d="M585 74 V128" stroke="#2458d6" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a)"/>
+    <path d="M980 74 V128" stroke="#2458d6" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#a)"/>
+    <g>
+      <rect x="20" y="130" width="340" height="320" rx="16" fill="#fff" stroke="#c4d4f6" stroke-width="2"/>
+      <text x="40" y="162" font-size="20" font-weight="800">Order service · :3001</text>
+      <text x="40" y="184" font-size="13" fill="#5d6880">process 1</text>
+      <rect x="40" y="198" width="300" height="86" rx="10" fill="#fff2db" stroke="#e7b864"/>
+      <text x="56" y="224" font-size="16" font-weight="700">Orchestrator</text>
+      <text x="56" y="246" font-size="13" fill="#5d6880">state machine + guard</text>
+      <text x="56" y="266" font-size="13" fill="#5d6880">intent → call → outcome · recovery loop 1s</text>
+      <rect x="40" y="300" width="300" height="130" rx="10" fill="#eee9fd" stroke="#b7a6ee"/>
+      <text x="56" y="326" font-size="16" font-weight="700">data/order.db</text>
+      <text x="56" y="350" font-size="13" fill="#3a3460">orders · sagas (phase, intent, op_id,</text>
+      <text x="56" y="368" font-size="13" fill="#3a3460">pending, reservation/charge/refund id)</text>
+      <text x="56" y="390" font-size="13" fill="#3a3460">saga_steps (seq, kind, op, pid)</text>
+    </g>
+    <g>
+      <rect x="415" y="130" width="340" height="320" rx="16" fill="#fff" stroke="#c4d4f6" stroke-width="2"/>
+      <text x="435" y="162" font-size="20" font-weight="800">Inventory · :3002</text>
+      <text x="435" y="184" font-size="13" fill="#5d6880">process 2</text>
+      <text x="435" y="222" font-size="14">POST reservations (reserve_op_id)</text>
+      <text x="435" y="244" font-size="14">POST reservations/:id/release</text>
+      <text x="435" y="266" font-size="14">GET operations/:op_id</text>
+      <rect x="435" y="300" width="300" height="130" rx="10" fill="#eee9fd" stroke="#b7a6ee"/>
+      <text x="451" y="326" font-size="16" font-weight="700">data/inventory.db</text>
+      <text x="451" y="350" font-size="13" fill="#3a3460">items · reservations</text>
+      <text x="451" y="368" font-size="13" fill="#3a3460">movements (hàng vào / ra)</text>
+      <text x="451" y="390" font-size="13" fill="#3a3460">operations (idempotency)</text>
+    </g>
+    <g>
+      <rect x="810" y="130" width="340" height="320" rx="16" fill="#fff" stroke="#c4d4f6" stroke-width="2"/>
+      <text x="830" y="162" font-size="20" font-weight="800">Payment (ví) · :3003</text>
+      <text x="830" y="184" font-size="13" fill="#5d6880">process 3</text>
+      <text x="830" y="222" font-size="14">POST charges (charge_op_id)</text>
+      <text x="830" y="244" font-size="14">POST charges/:id/refund</text>
+      <text x="830" y="266" font-size="14">GET operations/:op_id</text>
+      <rect x="830" y="300" width="300" height="130" rx="10" fill="#eee9fd" stroke="#b7a6ee"/>
+      <text x="846" y="326" font-size="16" font-weight="700">data/payment.db</text>
+      <text x="846" y="350" font-size="13" fill="#3a3460">wallets (số dư)</text>
+      <text x="846" y="368" font-size="13" fill="#3a3460">ledger: charge / refund / nạp — chỉ INSERT</text>
+      <text x="846" y="390" font-size="13" fill="#3a3460">operations (idempotency)</text>
+    </g>
+    <path d="M340 236 H411" stroke="#5d6880" stroke-width="2.5" marker-end="url(#a)"/>
+    <path d="M340 272 C 400 290, 740 290, 806 282" stroke="#5d6880" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+    <text x="585" y="482" font-size="14" fill="#5d6880" text-anchor="middle">Orchestrator gọi Inventory và Payment qua HTTP (timeout 2s); không có transaction chung giữa 3 DB</text>
+  </svg>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-title="Công nghệ">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>Lựa chọn công nghệ và lý do</h2>
+  <p class="sub">Mỗi lựa chọn phục vụ một yêu cầu cụ thể của bài</p>
+  <table>
+    <tr><th style="width:18%">Hạng mục</th><th style="width:28%">Chọn</th><th>Vì sao</th></tr>
+    <tr><td>Ngôn ngữ</td><td>Node.js 22 + Express 5</td><td>Nhóm đã dùng ở Block 5–6. <span class="mono">fetch</span> + <span class="mono">AbortSignal.timeout</span> có sẵn cho mọi lời gọi.</td></tr>
+    <tr><td>Database</td><td><b>SQLite, mỗi service 1 file</b><br><span class="mono">WAL + synchronous=FULL</span></td><td>3 DB độc lập thật. Commit là đã fsync, nên kill process không mất dữ liệu; "restart cùng DB" = chạy lại process. Không cần Docker.</td></tr>
+    <tr><td>Kiểu Saga</td><td>Orchestration trong Order</td><td>Saga record nằm cùng Order DB → đổi trạng thái đơn và saga trong <b>1 local transaction</b>.</td></tr>
+    <tr><td>Chạy Saga</td><td>Nền (202) + recovery loop 1s</td><td>Khách không bị treo khi Payment chết. Lần chạy đầu và lần phục hồi dùng chung một đoạn code.</td></tr>
+    <tr><td>Operation ID</td><td><span class="mono">S5:charge</span> suy từ saga, lưu trong intent</td><td>Retry hay restart luôn ra đúng ID cũ, không thể sinh C2.</td></tr>
+    <tr><td>Chống trùng</td><td>Bảng <span class="mono">operations</span> + UNIQUE</td><td>Hai lớp: code trả kết quả cũ; DB chặn bản trùng (<span class="mono">one_refund_per_charge</span>).</td></tr>
+    <tr><td>Điểm dừng</td><td>Freeze + marker + <b>kill process thật</b></td><td>Dừng đúng sau commit / trước response. Marker kèm PID và op ID là evidence.</td></tr>
+    <tr><td>UI</td><td>HTML/JS thuần, process riêng</td><td>Kill Order (F6) thì UI vẫn sống và báo "Order không truy cập được".</td></tr>
+    <tr><td>Test</td><td>Jest gọi <b>process thật</b> ở cổng 400x</td><td>Chứng minh ranh giới 3 process / 3 DB; không đụng dữ liệu demo.</td></tr>
+  </table>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-title="Bước tiến, bước bù">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>Saga checkout: bước tiến và bước bù</h2>
+  <p class="sub">Mỗi ô là một local commit trong DB của service sở hữu. Bù theo thứ tự <b>ngược</b>; quy định của lab: refund trước, release sau.</p>
+  <svg viewBox="0 0 1170 250" style="width:100%">
+    <defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#11804a"/></marker><marker id="br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#c0262f"/></marker></defs>
+    <g font-size="17" font-weight="700">
+      <rect x="10" y="20" width="250" height="70" rx="12" fill="#e2f5ea" stroke="#11804a" stroke-width="2"/><text x="30" y="50">1. CreateOrder</text><text x="30" y="74" font-size="13" font-weight="400" fill="#5d6880">Order DB · PENDING</text>
+      <rect x="310" y="20" width="250" height="70" rx="12" fill="#e2f5ea" stroke="#11804a" stroke-width="2"/><text x="330" y="50">2. ReserveInventory</text><text x="330" y="74" font-size="13" font-weight="400" fill="#5d6880">Inventory DB · R ACTIVE</text>
+      <rect x="610" y="20" width="250" height="70" rx="12" fill="#e2f5ea" stroke="#11804a" stroke-width="2"/><text x="630" y="50">3. ChargePayment</text><text x="630" y="74" font-size="13" font-weight="400" fill="#5d6880">Payment DB · C CHARGED</text>
+      <rect x="910" y="20" width="250" height="70" rx="12" fill="#e2f5ea" stroke="#11804a" stroke-width="2"/><text x="930" y="50">4. ConfirmOrder</text><text x="930" y="74" font-size="13" font-weight="400" fill="#5d6880">Order DB · CONFIRMED</text>
+      <rect x="10" y="160" width="250" height="70" rx="12" fill="#fff2db" stroke="#a35d00" stroke-width="2"/><text x="30" y="190">CancelOrder</text><text x="30" y="214" font-size="13" font-weight="400" fill="#5d6880">chỉ khi pending rỗng</text>
+      <rect x="310" y="160" width="250" height="70" rx="12" fill="#fff2db" stroke="#a35d00" stroke-width="2"/><text x="330" y="190">ReleaseInventory</text><text x="330" y="214" font-size="13" font-weight="400" fill="#5d6880">R → RELEASED, hàng về kho</text>
+      <rect x="610" y="160" width="250" height="70" rx="12" fill="#fff2db" stroke="#a35d00" stroke-width="2"/><text x="630" y="190">RefundPayment</text><text x="630" y="214" font-size="13" font-weight="400" fill="#5d6880">dòng MỚI RF → C, giữ C</text>
+    </g>
+    <path d="M260 55 H306" stroke="#11804a" stroke-width="3" marker-end="url(#b)"/><path d="M560 55 H606" stroke="#11804a" stroke-width="3" marker-end="url(#b)"/><path d="M860 55 H906" stroke="#11804a" stroke-width="3" marker-end="url(#b)"/>
+    <path d="M1035 90 V195 H864" stroke="#c0262f" stroke-width="3" stroke-dasharray="7 5" fill="none" marker-end="url(#br)"/>
+    <path d="M610 195 H564" stroke="#c0262f" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#br)"/><path d="M310 195 H264" stroke="#c0262f" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#br)"/>
+    <text x="1045" y="140" font-size="14" fill="#c0262f" font-weight="700">confirm lỗi (F3)</text>
+  </svg>
+  <table>
+    <tr><th>Lỗi ở</th><th>Đã commit</th><th>Bù</th><th>Kết quả cho khách</th></tr>
+    <tr><td>F1 · Reserve bị từ chối (hết hàng)</td><td>không có gì</td><td>— → CANCELLED</td><td>Không bị trừ tiền</td></tr>
+    <tr><td>F2 · Charge FAILED (ví không đủ)</td><td>reservation</td><td>release → cancel</td><td>Không bị trừ, hàng về kho</td></tr>
+    <tr><td>F3 · Confirm bị từ chối</td><td>reservation + charge</td><td><b>refund → release</b> → cancel</td><td>Trừ rồi hoàn lại đủ: <b>tiền vẫn còn</b></td></tr>
+  </table>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-title="State machine">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>State machine có guard</h2>
+  <p class="sub"><span class="mono">machine.js</span> là hàm thuần <span class="mono">apply(saga, event)</span>: không DB, không mạng → 16 unit test. Thiếu bằng chứng thì ném <span class="mono">GuardError</span>.</p>
+  <div class="cols c64">
+    <svg viewBox="0 0 700 400" style="width:100%">
+      <defs><marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5d6880"/></marker></defs>
+      <g font-size="14" font-weight="700" text-anchor="middle">
+        <rect x="10" y="30" width="120" height="40" rx="20" fill="#e7eefc" stroke="#2458d6"/><text x="70" y="55">PENDING</text>
+        <rect x="190" y="30" width="130" height="40" rx="20" fill="#e7eefc" stroke="#2458d6"/><text x="255" y="55">RESERVED</text>
+        <rect x="380" y="30" width="130" height="40" rx="20" fill="#e7eefc" stroke="#2458d6"/><text x="445" y="55">CHARGED</text>
+        <rect x="560" y="30" width="130" height="40" rx="20" fill="#e2f5ea" stroke="#11804a" stroke-width="2.5"/><text x="625" y="55">CONFIRMED</text>
+        <rect x="290" y="170" width="140" height="40" rx="20" fill="#fff2db" stroke="#a35d00"/><text x="360" y="195">RECOVERING</text>
+        <rect x="380" y="320" width="160" height="40" rx="20" fill="#fff2db" stroke="#a35d00"/><text x="460" y="345">COMPENSATING</text>
+        <rect x="20" y="320" width="140" height="40" rx="20" fill="#fde9ea" stroke="#c0262f" stroke-width="2.5"/><text x="90" y="345">CANCELLED</text>
+      </g>
+      <g stroke="#5d6880" stroke-width="2" fill="none">
+        <path d="M130 50 H186" marker-end="url(#m)"/><path d="M320 50 H376" marker-end="url(#m)"/><path d="M510 50 H556" marker-end="url(#m)"/>
+        <path d="M60 70 V316" marker-end="url(#m)"/>
+        <path d="M270 70 L330 166" marker-end="url(#m)"/>
+        <path d="M400 170 L430 74" marker-end="url(#m)"/>
+        <path d="M360 210 L440 316" marker-end="url(#m)"/>
+        <path d="M230 70 C 200 250, 300 330, 376 338" marker-end="url(#m)"/>
+        <path d="M470 70 L490 316" marker-end="url(#m)"/>
+        <path d="M380 340 H164" marker-end="url(#m)"/>
+        <path d="M335 210 C 300 260, 400 260, 385 213" marker-end="url(#m)"/>
+        <path d="M520 360 C 560 400, 620 360, 545 336" marker-end="url(#m)"/>
+      </g>
+      <g font-size="12" fill="#5d6880">
+        <text x="160" y="20" text-anchor="middle">reserve OK</text><text x="350" y="20" text-anchor="middle">charge OK</text><text x="535" y="20" text-anchor="middle">confirm OK</text>
+        <text x="66" y="200">reserve bị từ chối</text>
+        <text x="220" y="125">charge timeout</text>
+        <text x="420" y="125">biết CHARGED</text>
+        <text x="400" y="262">biết FAILED</text>
+        <text x="118" y="250">charge FAILED</text>
+        <text x="492" y="210">confirm bị từ chối</text>
+        <text x="210" y="334">đã bù xong (pending rỗng)</text>
+        <text x="270" y="262">chưa rõ: hỏi lại</text>
+        <text x="560" y="392">bù lỗi tạm: thử lại</text>
+      </g>
+    </svg>
+    <div class="card"><h3>Guard chặn đúng các lỗi trong slide chấm snapshot</h3><ul>
+      <li>Chưa giữ hàng → <b>không charge</b> (F1 không gọi Payment)</li>
+      <li>Chỉ refund charge đã <b>biết</b> CHARGED</li>
+      <li><b>Refund trước, release sau</b></li>
+      <li>Cancel chỉ khi <b>pending rỗng</b> → không CANCELLED khi C chưa hoàn</li>
+      <li>RECOVERING <b>không có đường thẳng</b> tới CANCELLED / CONFIRMED → không terminal giả</li>
+      <li>Saga đã kết thúc thì không nhận sự kiện</li></ul>
+      <p class="note"><span class="mono">nextAction()</span> suy việc tiếp theo chỉ từ trạng thái <b>đã lưu trong DB</b>, không từ RAM.</p></div>
+  </div>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-title="Intent và op ID">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>Intent → call → outcome, và operation ID</h2>
+  <p class="sub">Process mất RAM khi chết; chỉ DB còn lại. Vì vậy ghi <b>việc sắp làm + ID cố định</b> xuống DB <b>trước</b> khi gọi ra ngoài.</p>
+  <div class="cols c2">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <pre class="term"><span class="y">(1) INTENT </span> tx Order DB: intent = charge, op S5:charge
+<span class="y">(2) CALL   </span> POST /payments/charges {charge_op_id: S5:charge}
+            → Payment: ví −350k + ledger C4 + operations  (1 tx)
+<span class="y">(3) OUTCOME</span> tx Order DB: CHARGED, charge_id=C4, xóa intent</pre>
+      <table>
+        <tr><th>Chết ở</th><th>Order DB còn</th><th>Khi restart</th></tr>
+        <tr><td>sau (1)</td><td>intent S5:charge</td><td>gửi lại <b>cùng</b> op → thu lần đầu</td></tr>
+        <tr><td>giữa (2)</td><td>intent S5:charge</td><td>gửi lại cùng op → Payment trả kết quả cũ</td></tr>
+        <tr><td>sau (2), trước (3) — <b>F6</b></td><td>intent S5:charge</td><td>query / gửi lại → CHARGED → confirm</td></tr>
+      </table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card pri"><h3>Operation ID ổn định</h3><p><span class="mono">opId(saga, step)</span> → <span class="mono">S5:reserve</span>, <span class="mono">S5:charge</span>, <span class="mono">S5:refund</span>, <span class="mono">S5:release</span>. Suy từ saga nên không thể sinh ID mới.</p></div>
+      <div class="card"><h3>Service idempotent</h3><ul>
+        <li><span class="mono">operations(op_id PK, request_hash, status, result)</span> ghi <b>cùng tx</b> với nghiệp vụ</li>
+        <li>Cùng op + cùng nội dung → trả kết quả cũ (<span class="mono">replayed: true</span>)</li>
+        <li>Cùng op + khác nội dung → <span class="mono">409 OP_PAYLOAD_MISMATCH</span></li>
+        <li>Chốt ở DB: <span class="mono">ledger.op_id UNIQUE</span>, <span class="mono">one_refund_per_charge</span></li></ul></div>
+      <div class="card bad"><p><b>Sai:</b> chỉ lưu "RESERVED" rồi restart → không biết đã charge chưa → sinh C2 (thu 2 lần) hoặc hủy đơn khi tiền đã thu.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-title="Unknown outcome">
+  <div class="kick">2 · Thiết kế</div>
+  <h2>Timeout không có nghĩa là thất bại</h2>
+  <p class="sub">Orchestrator phân loại từng response; "không biết" thì giữ RECOVERING và hỏi lại bằng đúng op cũ</p>
+  <div class="cols c2">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <table>
+        <tr><th>Nhận được</th><th>Ý nghĩa</th><th>Hành động</th></tr>
+        <tr><td><span class="tag ok">201</span></td><td>Chắc chắn đã thu</td><td>CHARGED → confirm</td></tr>
+        <tr><td><span class="tag bad">402 FAILED</span></td><td>Chắc chắn <b>không</b> thu</td><td>COMPENSATING [release]</td></tr>
+        <tr><td><span class="tag warn">timeout · ECONNRESET<br>ECONNREFUSED · 5xx</span></td><td><b>Không biết</b></td><td><b>RECOVERING</b>, giữ intent + op</td></tr>
+      </table>
+      <div class="card bad"><p><b>Không bao giờ</b> coi timeout là thất bại rồi hủy đơn (khách mất tiền), và <b>không bao giờ</b> charge bằng ID mới (thu 2 lần).</p></div>
+    </div>
+    <div class="card warn"><h3>Ở RECOVERING</h3><ol style="margin:4px 0 0;padding-left:20px;font-size:15px;line-height:1.55">
+      <li><span class="mono">GET /payments/operations/S5:charge</span></li>
+      <li><b>SUCCEEDED</b> → ghi CHARGED → confirm (policy lab)</li>
+      <li><b>FAILED</b> → release → cancel</li>
+      <li><b>NOT_FOUND / PENDING</b> → chưa là kết luận → <b>gửi lại cùng op, cùng payload</b></li>
+      <li>Không truy cập được → thử lại sau 1 → 2 → 4 → 5s</li></ol>
+      <p style="margin-top:10px">Cấu hình: timeout gọi service <b>2s</b> · recovery loop <b>1s</b> · backoff <b>1/2/4/5s</b> · resume khi Order khởi động + <span class="mono">POST /sagas/:id/resume</span>.</p></div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-title="App">
+  <div class="kick">3 · Demo</div>
+  <h2>Một app thật, xem từ bốn góc nhìn</h2>
+  <p class="sub">Đúng yêu cầu của thầy: khách mua hàng xem lịch sử và tiền của mình · thủ kho xem hàng vào/ra · ví xem giao dịch · ma trận kịch bản. <a class="btn" href="http://127.0.0.1:3000" target="_blank">Mở app ↗</a></p>
+  <div class="cols c2">
+    <div class="shotbox"><img class="shot" src="img/03-shop.jpg" alt="Mua hàng"><div class="cap">🛒 Mua hàng: chọn khách, số dư ví, sản phẩm còn/hết, lịch sử đơn + "Tiền của khách"</div></div>
+    <div class="shotbox"><img class="shot" src="img/08-kho-movements.jpg" alt="Kho"><div class="cap">📦 Kho: tồn khả dụng, đang giữ, lịch sử hàng vào (nhập, nhả) / hàng ra (giữ cho đơn)</div></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-title="Ví và ma trận">
+  <div class="kick">3 · Demo</div>
+  <h2>Ví tiền và ma trận kịch bản</h2>
+  <p class="sub">Ledger chỉ thêm dòng: thu tiền, hoàn tiền (trỏ về dòng thu), nạp tiền. Ma trận tự kiểm oracle từ dữ liệu đọc qua API của cả 3 service.</p>
+  <div class="cols c2">
+    <div class="shotbox"><img class="shot" src="img/09-vi.jpg" alt="Ví"><div class="cap">💳 Ví: số dư từng khách, đã thu / đã hoàn / thu ròng, mọi giao dịch kèm operation ID</div></div>
+    <div class="shotbox"><img class="shot" src="img/02-matrix.jpg" alt="Ma trận"><div class="cap">🧪 Ma trận: nút Chạy cho H0–F6, đơn gần nhất, oracle ĐẠT x/y</div></div>
+  </div>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-title="Demo H0–F3">
+  <div class="kick">3 · Demo trực tiếp</div>
+  <h2>H0 – F3: thành công và ba kiểu thất bại dứt khoát</h2>
+  <p class="sub">F1, F2 xảy ra <b>tự nhiên</b> (loa hết hàng, ví Bình chỉ có 300k). F3 dùng fault hook <span class="mono">confirm=reject</span>.</p>
+  <div class="cols c2">
+    <div class="shotbox"><img class="shot" src="img/04-history.jpg" alt="Lịch sử đơn"><div class="cap">Lịch sử đơn: CONFIRMED −350.000đ · F1 "Không bị trừ tiền" · F2 "Thanh toán thất bại, không bị trừ" · F3 "−350.000đ → +350.000đ = 0đ"</div></div>
+    <div class="shotbox"><img class="shot" src="img/05-detail-f3.jpg" alt="Chi tiết F3"><div class="cap">F3: "Mua thất bại nhưng tiền vẫn còn". Ledger có C3 CHARGED + RF1 → C3; các bước: refund (#25) trước release</div></div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-title="Demo F4">
+  <div class="kick">3 · Demo trực tiếp</div>
+  <h2>F4: kill Payment sau khi đã thu, trước khi trả response</h2>
+  <p class="sub"><span class="mono">charge.afterCommit=freeze</span> → marker → <span class="mono">npm run lab -- kill payment</span> → RECOVERING → <span class="mono">npm run lab -- start payment</span> → CONFIRMED</p>
+  <div class="cols c3">
+    <div class="shotbox"><img class="shot" src="img/10-f4-payment-down.jpg" alt=""><div class="cap">① Payment không truy cập được; O8 "Đang xác minh thanh toán RECOVERING"</div></div>
+    <div class="shotbox"><img class="shot" src="img/11-f4-recovering.jpg" alt=""><div class="cap">② UNKNOWN → RECOVERING, "KHÔNG charge ID mới"; QUERY lặp lại, backoff 1→2→4→5s</div></div>
+    <div class="shotbox"><img class="shot" src="img/12-f4-recovered.jpg" alt=""><div class="cap">③ Payment sống lại: "biết qua query op S8:charge: SUCCEEDED" → CONFIRMED</div></div>
+  </div>
+  <div class="card ok" style="flex:none"><p>Evidence (<span class="mono">evidence/F4/timeline.txt</span>, đơn O5): lúc Payment chết, snapshot đọc file DB: <span class="mono">Order RECOVERING · R4 ACTIVE · C4 CHARGED op=S5:charge</span>. Cuối: <b>đúng 1 charge</b>, oracle F4 <b>8/8</b>; hội tụ <b>0,7–4 giây</b> sau khi start Payment.</p></div>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-title="Demo F5, F6">
+  <div class="kick">3 · Demo trực tiếp</div>
+  <h2>F5 hoàn tiền lỗi tạm thời · F6 kill orchestrator tại khoảng hở</h2>
+  <div class="cols c2">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card warn"><h3>F5 — refund trả 503 (giữ tới khi gỡ)</h3><p>Không báo CANCELLED khi tiền chưa hoàn. Gỡ lỗi → refund đúng 1 lần → release → cancel.</p></div>
+      <pre class="term">SNAPSHOT khi-refund-loi
+  Order DB    : <span class="y">COMPENSATING</span> intent=refund S6:refund
+                pending=[refund, release]
+  Inventory DB: R5 <span class="y">ACTIVE</span>   (chưa release vì refund chưa xong)
+  Payment DB  : C5 charge 350000 CHARGED
+GỠ FAULT payment refund → hội tụ sau <span class="g">1290ms</span>
+SNAPSHOT cuoi
+  Order DB    : <span class="g">CANCELLED</span> pending=[]
+  Inventory DB: R5 RELEASED
+  Payment DB  : C5 CHARGED | RF2 refund REFUNDED →C5
+ORACLE F5: <span class="g">ĐẠT 8/8</span></pre>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card pri"><h3>F6 — Order treo sau khi nhận CHARGED, trước khi ghi outcome</h3><p>Kill Order → start lại <b>cùng file DB</b> → RESUME đọc intent → dùng lại op cũ.</p></div>
+      <pre class="term">MARKER order.charge.afterCall (pid 9144, op S7:charge, C6)
+KILL order pid=9144
+SNAPSHOT sau-khi-dung
+  Order DB (<span class="y">db-file</span>): RESERVED phase=charge
+                     intent=charge <span class="y">S7:charge</span>
+  Payment DB: C6 charge 200000 CHARGED op=S7:charge
+START order pid=15456 (process mới, cùng file DB)
+Hội tụ sau <span class="g">535ms</span>, op trước restart S7:charge
+SNAPSHOT cuoi: <span class="g">CONFIRMED</span> · R6 ACTIVE · C6 (1 charge)
+ORACLE F6: <span class="g">ĐẠT 9/9</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-title="Bằng chứng">
+  <div class="kick">4 · Bằng chứng</div>
+  <h2>Kết quả: 28/28 test, 7/7 kịch bản đạt oracle</h2>
+  <p class="sub">Test chạy trên 3 process thật (cổng 400x). Evidence: <span class="mono">evidence/test-output.txt</span>, <span class="mono">evidence/SUMMARY.md</span>, <span class="mono">evidence/&lt;ID&gt;/timeline.txt</span></p>
+  <div class="cols c46">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="cols c2" style="flex:none">
+        <div class="card ok"><div class="big">28/28</div><p>test xanh · 4 suite · khoảng 15 giây</p></div>
+        <div class="card ok"><div class="big">48/48</div><p>check oracle trên 7 kịch bản</p></div>
+      </div>
+      <table>
+        <tr><th>Suite</th><th>Số test</th><th>Nội dung</th></tr>
+        <tr><td>unit/machine</td><td>16</td><td>chuyển trạng thái, guard, unknown outcome</td></tr>
+        <tr><td>idempotency</td><td>5</td><td>gửi lại cùng op, khác payload → 409, refund 1 lần</td></tr>
+        <tr><td>saga.v1</td><td>4</td><td><b>H0, F1, F2, F3</b>: assert cả 3 kho + toàn ledger</td></tr>
+        <tr><td>recovery</td><td>3</td><td><b>F4, F5, F6</b> tự động, kill process thật</td></tr>
+      </table>
+    </div>
+    <table>
+      <tr><th>ID</th><th>Giữa chừng</th><th>Cuối</th><th>Ledger của đơn</th><th>Oracle</th><th>Hội tụ</th></tr>
+      <tr><td>H0</td><td>-</td><td><span class="tag ok">CONFIRMED</span></td><td>C1 CHARGED</td><td>6/6</td><td>-</td></tr>
+      <tr><td>F1</td><td>-</td><td><span class="tag bad">CANCELLED</span></td><td>trống</td><td>5/5</td><td>-</td></tr>
+      <tr><td>F2</td><td>-</td><td><span class="tag bad">CANCELLED</span></td><td>C2 FAILED</td><td>5/5</td><td>-</td></tr>
+      <tr><td>F3</td><td>-</td><td><span class="tag bad">CANCELLED</span></td><td>C3 CHARGED · RF1 → C3</td><td>7/7</td><td>-</td></tr>
+      <tr><td>F4</td><td><span class="tag warn">RECOVERING</span></td><td><span class="tag ok">CONFIRMED</span></td><td>C4 CHARGED (1 charge)</td><td>8/8</td><td>0,7–4s</td></tr>
+      <tr><td>F5</td><td><span class="tag warn">COMPENSATING</span></td><td><span class="tag bad">CANCELLED</span></td><td>C5 CHARGED · RF2 → C5</td><td>8/8</td><td>1,3s</td></tr>
+      <tr><td>F6</td><td><span class="tag pri">RESERVED + intent</span></td><td><span class="tag ok">CONFIRMED</span></td><td>C6 CHARGED, op S7:charge</td><td>9/9</td><td>0,5s</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-title="Đánh đổi">
+  <div class="kick">5 · Đánh đổi</div>
+  <h2>Đánh đổi và giới hạn</h2>
+  <p class="sub">Saga đổi atomicity tức thời lấy tính sẵn sàng; nhóm ghi rõ những gì <b>chưa</b> đảm bảo</p>
+  <div class="cols c3">
+    <div class="card"><h3>Mất isolation</h3><p>Trong lúc saga chạy, người khác thấy hàng đang bị giữ. Nhóm dùng trạng thái "Đang xử lý" (semantic lock) để thể hiện.</p></div>
+    <div class="card"><h3>Bù có độ trễ</h3><p>Khách thấy tiền bị trừ trong khoảng từ lúc charge đến lúc refund. Refund không xóa được thông báo đã gửi hay phí giao dịch.</p></div>
+    <div class="card"><h3>Một orchestrator</h3><p>Chống chạy trùng bằng RAM. Nhiều instance cần lease + fencing cho từng saga.</p></div>
+    <div class="card"><h3>Chưa có broker / outbox</h3><p>Saga record bền không đảm bảo message hay tác động ngoài xảy ra đúng một lần. Đây là nội dung block sau.</p></div>
+    <div class="card"><h3>SQLite</h3><p>Đủ cho 3 DB độc lập và bền; không chứng minh concurrency hay tải. Đổi sang PostgreSQL chỉ cần thay tầng DB, logic Saga giữ nguyên.</p></div>
+    <div class="card"><h3>Refund lỗi vĩnh viễn</h3><p>Ngoài phạm vi lab (chỉ có lỗi tạm thời F5); thực tế cần hàng chờ xử lý thủ công.</p></div>
+  </div>
+</section>
+
+<!-- 18 -->
+<section class="slide cover" data-title="Kết luận">
+  <div class="kick">Tổng kết</div>
+  <h1>Ba điều nhóm em rút ra</h1>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:10px">
+    <div class="chip" style="border-radius:14px;padding:16px;font-size:18px;line-height:1.5"><b>Compensation không phải rollback.</b><br>Refund là dòng mới, lịch sử charge vẫn còn.</div>
+    <div class="chip" style="border-radius:14px;padding:16px;font-size:18px;line-height:1.5"><b>Timeout là "chưa biết".</b><br>RECOVERING + hỏi lại bằng đúng op ID cũ.</div>
+    <div class="chip" style="border-radius:14px;padding:16px;font-size:18px;line-height:1.5"><b>Ghi intent trước khi gọi.</b><br>Process chết chỉ còn DB; DB phải đủ để tiếp tục.</div>
+  </div>
+  <p class="sub" style="margin-top:30px">Em cảm ơn thầy đã lắng nghe. Nhóm em sẵn sàng nhận câu hỏi.</p>
+</section>
+
+</div></div>
+<div id="nav"><button id="prev">←</button><span id="count"></span><button id="next">→</button><button id="full" title="Toàn màn hình (F)">⛶</button></div>
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const deck=document.getElementById('deck');
+  slides.forEach((s,i)=>{
+    const f=document.createElement('div');f.className='foot';
+    f.innerHTML=`<span>Checkout Saga · Block 7 · Nhóm 7</span><span>${s.dataset.title} · ${i+1}/${slides.length}</span>`;
+    if(!s.classList.contains('cover'))s.appendChild(f);
+  });
+  let cur=0;
+  function show(i){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach((s,k)=>s.classList.toggle('on',k===cur));
+    document.getElementById('count').textContent=`${cur+1} / ${slides.length}`;
+    document.getElementById('progress').style.width=`${(cur+1)/slides.length*100}%`;
+    if(location.hash!==`#${cur+1}`)history.replaceState(null,'',`#${cur+1}`);
+  }
+  function fit(){
+    const s=Math.min(window.innerWidth/1300,window.innerHeight/740);
+    deck.style.transform=`scale(${s})`;
+  }
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',()=>{const n=parseInt(location.hash.slice(1));if(n)show(n-1)});
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' ','Enter'].includes(e.key)){e.preventDefault();show(cur+1)}
+    if(['ArrowLeft','PageUp','Backspace'].includes(e.key)){e.preventDefault();show(cur-1)}
+    if(e.key==='Home')show(0);
+    if(e.key==='End')show(slides.length-1);
+    if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  });
+  document.getElementById('prev').onclick=()=>show(cur-1);
+  document.getElementById('next').onclick=()=>show(cur+1);
+  document.getElementById('full').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+  fit();
+  show((parseInt(location.hash.slice(1))||1)-1);
+})();
+</script>
+</body>
+</html>

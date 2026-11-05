@@ -1,0 +1,33 @@
+# F4 — Payment chết sau khi đã thu, trước response
+Đơn O5, saga S5. Oracle: Khi Payment dừng: RECOVERING. Restore, query cùng op thấy CHARGED, confirm; cuối như H0.
+
+[2026-11-05T04:00:04.944Z] ===== F4: Payment chết sau khi đã thu, trước response =====
+[2026-11-05T04:00:04.948Z] FAULT payment: charge.afterCommit=freeze (1 lần) → HTTP 200
+[2026-11-05T04:00:04.959Z] ĐẶT HÀNG CUS-AN mua SKU-TAINGHE → O5 / S5 (350000đ)
+[2026-11-05T04:00:05.016Z] MARKER payment.charge.committed (pid 25876, op S5:charge, C4)
+[2026-11-05T04:00:05.019Z] KILL payment pid=25876 (process thật bị dừng)
+[2026-11-05T04:00:05.192Z] SNAPSHOT khi-payment-dung
+[2026-11-05T04:00:05.175Z] Snapshot đơn O5
+  Order DB    (api): RECOVERING  phase=charge  intent=charge S5:charge  pending=[]
+  Inventory DB(api): R4 ACTIVE
+  Payment DB  (db-file (Payment không truy cập được: ECONNREFUSED)): C4 charge 350000 CHARGED op=S5:charge
+[2026-11-05T04:00:08.208Z] Sau 3 giây Payment vẫn chết: đơn O5 = RECOVERING (không terminal giả)
+[2026-11-05T04:00:08.562Z] START payment pid=27096 (process mới, cùng file DB)
+[2026-11-05T04:00:08.887Z] Hội tụ sau 679ms kể từ khi start Payment
+[2026-11-05T04:00:08.896Z] SNAPSHOT cuoi
+[2026-11-05T04:00:08.888Z] Snapshot đơn O5
+  Order DB    (api): CONFIRMED  phase=done  intent=-  pending=[]
+  Inventory DB(api): R4 ACTIVE
+  Payment DB  (api): C4 charge 350000 CHARGED op=S5:charge
+[2026-11-05T04:00:08.896Z] ORACLE F4: ĐẠT 8/8
+
+Kiểm tra oracle:
+  ✓ Order CONFIRMED (CONFIRMED)
+  ✓ Không còn pending (-)
+  ✓ Đúng 1 reservation ACTIVE (1/1)
+  ✓ Đúng 1 charge CHARGED (1)
+  ✓ Không refund (0)
+  ✓ Khách trả đúng tiền đơn (350000)
+  ✓ Đã qua RECOVERING (không terminal giả) (có)
+  ✓ Chỉ 1 charge op ID (không charge mới) (S5:charge)
+KẾT LUẬN: ĐẠT
