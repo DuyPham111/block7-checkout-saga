@@ -12,7 +12,8 @@ App bán hàng **Saga Shop** gồm ba service HTTP: **Order**, **Inventory** và
 | [AUDIT.md](AUDIT.md) | Đối chiếu từng yêu cầu của đề ↔ nơi hiện thực ↔ test/evidence |
 | [SUBMISSION.md](SUBMISSION.md) | Thông tin gói nộp |
 | [docs/](docs/) | Nguyên lý hoạt động, hướng dẫn demo, kịch bản thuyết trình, [kịch bản video demo](docs/KICH-BAN-VIDEO.md), đặc tả OpenAPI |
-| [evidence/](evidence/) | Kết quả test, tổng hợp H0–F6, timeline + snapshot ba kho, baseline |
+| [evidence/](evidence/) | Kết quả test, tổng hợp H0–F6, timeline + snapshot ba kho, baseline, ảnh chụp khi quay video |
+| **Video demo** | 6 video YouTube cho H0, F1–F6: link trong [SUBMISSION.md](SUBMISSION.md#video-demo) |
 
 ---
 

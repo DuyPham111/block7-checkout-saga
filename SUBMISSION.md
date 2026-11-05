@@ -6,12 +6,23 @@
 - **Nội dung:** mã nguồn, dữ liệu ban đầu (`data/seed/`), README.md, REPORT.md, REPORT.html, AUDIT.md, tài liệu (`docs/`), slide (`presentation/`), evidence (`evidence/`).
 - **Không kèm:** `node_modules`, file DB lúc chạy (`data/*.db`), `run/`, `logs/`, `.git`. Cài lại thư viện bằng `npm ci`; DB tự tạo từ seed khi chạy `npm run reset`.
 - **Evidence** trong `evidence/` là output của lượt chạy thật ngày 05/11/2026 (Windows 11, Node 22.16.0). Không sửa tay số liệu. Tái tạo bằng `npm run test:report`, `npm run evidence`, `npm run baseline`.
-- **Video demo H0, F1–F6 trên UI:** quay theo [docs/KICH-BAN-VIDEO.md](docs/KICH-BAN-VIDEO.md) (7 cảnh, khoảng 6 phút) và nộp kèm. Nộp dưới dạng link thì ghi link vào đây: _(chưa có)_. Ảnh UI lúc pending và lúc kết thúc lưu ở `evidence/video-screens/`.
+- **Video demo H0, F1–F6 trên UI:** sáu video trên YouTube (bảng bên dưới), quay theo [docs/KICH-BAN-VIDEO.md](docs/KICH-BAN-VIDEO.md). Ảnh UI lúc pending và lúc kết thúc chụp trong lúc quay: [evidence/video-screens/](evidence/video-screens/).
 - **Tạo gói** từ repository (chỉ gồm file được git theo dõi):
 
   ```bash
   git archive --format=zip -o ../7-Block7-23127045-23127102-23127159-23127183-23127393.zip HEAD
   ```
+
+## Video demo
+
+| # | Video | Link |
+| --- | --- | --- |
+| 1 | Giới thiệu và vấn đề khi không có Saga · **H0**: mua hàng thành công | https://youtu.be/_dfllA9-DJw |
+| 2 | **F1**: kho từ chối (hết hàng) · **F2**: ví không đủ tiền, nhả hàng về kho | https://youtu.be/ZUiL-FsvjRI |
+| 3 | **F3**: xác nhận bị từ chối sau khi đã thu tiền | https://youtu.be/CgvdUpj-yQ4 |
+| 4 | **F4**: kill Payment sau khi đã thu (RECOVERING) | https://youtu.be/5yMqGiMj3yI |
+| 5 | **F5**: hoàn tiền lỗi tạm thời (COMPENSATING) | https://youtu.be/mwye_u-j5YU |
+| 6 | **F6**: kill orchestrator tại khoảng hở | https://youtu.be/FR5FmQmFBwg |
 
 ## Đọc gói theo thứ tự
 
