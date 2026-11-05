@@ -204,7 +204,7 @@ REPORT.md, REPORT.html, AUDIT.md, SUBMISSION.md
 
 | Hiện tượng | Cách xử lý |
 | --- | --- |
-| `npm ci` lỗi khi build `better-sqlite3` | Kiểm tra Node ≥ 22 (`node -v`). Trên Windows nếu không tải được bản build sẵn, cài "Desktop development with C++" (Visual Studio Build Tools) rồi chạy lại |
+| `npm ci` báo `gyp ERR! find VS` | Dự án đã có `.npmrc` với `ignore-scripts=true` để dùng binary build sẵn của `better-sqlite3`, không cần Visual Studio. Kiểm tra file `.npmrc` có được giải nén (file ẩn) và Node ≥ 22 (`node -v`), rồi chạy lại `npm ci` |
 | Một service `CHƯA LÊN` | Xem `npm run lab -- logs <service> 30`. Nếu cổng bị chiếm: `npm run stop`; trên Windows dùng `netstat -ano \| findstr :3001` rồi `taskkill /F /PID <pid>` |
 | `EBUSY` khi reset | Windows nhả khóa file chậm sau khi kill; `reset` đã tự thử lại. Nếu vẫn lỗi, chạy lại `npm run reset` |
 | Đơn kẹt ở COMPENSATING / RECOVERING | Đó là trạng thái chờ đúng thiết kế: kiểm tra `npm run lab -- fault list` và `npm run lab -- status`, gỡ fault hoặc start service đang chết |

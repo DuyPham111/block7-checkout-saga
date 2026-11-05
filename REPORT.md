@@ -403,7 +403,7 @@ flowchart LR
 > - **Nộp file `.db`**: nhị phân, phụ thuộc trạng thái lúc chụp; seed JSON tái tạo được.
 > - **Docker image**: xem mục 4.15.
 >
-> **Đánh đổi chấp nhận:** cần cài native module `better-sqlite3` (có bản build sẵn cho Node 22 Windows/Linux/macOS).
+> **Đánh đổi chấp nhận:** `better-sqlite3` là native module. Bản 13 kèm sẵn binary cho Windows, Linux, macOS; nhóm đặt `ignore-scripts=true` trong `.npmrc` để `npm ci` không gọi `node-gyp` (lỗi trên máy không có Visual Studio C++, phát hiện khi thử cài gói ZIP trên thư mục sạch).
 
 ## 5. Bảng tóm tắt lựa chọn
 

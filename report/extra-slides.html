@@ -319,7 +319,7 @@
       <li><b>Seed viết cứng trong code</b> (bản đầu): khó xem, khó sửa</li>
       <li><b>Nộp file .db</b>: nhị phân, phụ thuộc lúc chụp</li>
       <li><b>Docker image</b>: xem lựa chọn 9 (kill/start chậm, cần Docker Desktop)</li></ul></div>
-    <div class="card warn"><h3>Đánh đổi</h3><p>Cần native module <span class="mono">better-sqlite3</span> (có bản build sẵn cho Node 22 trên Windows, Linux, macOS).</p></div>
+    <div class="card warn"><h3>Đánh đổi</h3><p><span class="mono">better-sqlite3</span> là native module, nhưng đã kèm binary build sẵn cho Windows, Linux, macOS. <span class="mono">.npmrc</span> đặt <span class="mono">ignore-scripts=true</span> để <span class="mono">npm ci</span> không cần Visual Studio C++.</p></div>
   </div>
   <aside class="notes">Yêu cầu nộp gồm mã nguồn, data và README hướng dẫn triển khai. Dữ liệu ban đầu được tách thành file JSON để dễ đọc và nộp kèm; các file DB lúc chạy (data/*.db) được tạo lại từ seed và không nộp. Lệnh reset chỉ xóa file .db, giữ seed.</aside>
 </section>
